@@ -1,0 +1,45 @@
+balanceInfo:
+  - "&6Игровой баланс&8: &c(balance)&6."
+  - "&6Донат-Валюта&8: &b(coins)&6."
+balanceInfoOther:
+  - "&6Информация о балансах игрока (player):"
+  - "&6Игровой баланс&8: &c(balance)&6."
+  - "&6Донат-Валюта&8: &b(coins)&6."
+vaultPaySuccessful:
+  - "&6Вы успешно перевели игроку (player) &c(money)&6."
+  - "&6Ваш баланс&8: &c(new-balance)&6."
+vaultPayErrorMaxBalance:
+  - "&6Сумма, которую вы пытаетесь перевести превысит максимальный баланс игрока."
+  - "&6Баланс игрока&8: &c(balance)&6. Максимально допустимый баланс: &e(max-balance)"
+vaultNoMoney:
+  - "&6Недостаточно средств на вашем балансе."
+  - "&6Ваш баланс&8: &c(balance)&6."
+vaultPayReceived:
+  - "&c(player)&6 перевёл вам &c(money)&6."
+  - "&6Теперь ваш баланс составляет: &c(new-balance)&6."
+errorMinTransaction:
+  - "&6Сумма перевода должна быть минимум &c(sum)"
+  - "&6Вы пытаетесь перевести: (money)"
+
+vaultNoPlayerMoney:             "&6У игрока &cне достаточно&6 средств."
+vaultPayUsage:                  "&6Использование - &c/(label) игрок количество"
+vaultSenderWithdrawn:           "&6С игрока &c(player)&7 снято &c(money)&6."
+playerNotFound:                 "&6Игрок не найден или не в сети."
+notInteger:                     "&6Вы ввели неверное число&8: &c(number)"
+paySelf:                        "&6Вы &cне можете&6 перевести самому себе деньги."
+vaultAddMoney:                  "&6Вы успешно выдали &c(player)&e (money) &6."
+vaultDetMoney:                  "&6Вы успешно установили &c(player)&e (money) &6."
+
+#Настройка сообщений команды /coins
+coinsNoPlayerMoney:             "&6У игрока &cне достаточно&6 средств."
+coinsSenderWithdrawn:           "&6С игрока &c(player)&6 снято &c(coins)&6."
+coinsAddMoney:                  "&6Вы успешно выдали игроку &b(player) (coins)&6."
+coinsSetMoney:                  "&6Вы успешно установили игроку &b(player) (coins)&6."
+
+moneyTop:
+  - "&cТоп богачей сервера."
+  - "(top)"
+
+coinsTop:
+  - "&cТоп богачей сервера по коинам."
+  - "(top)"

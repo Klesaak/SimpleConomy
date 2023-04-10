@@ -1,0 +1,54 @@
+#Доступные хранилища: mysql, redis, file
+storage: file
+
+#Использовать ли redis pub-sub технологию для отправки пакета-обновления данных всем плагинам экономики.
+useRedisMessagingUpdater: false
+
+#Настройка mysql хранилища
+mysql:
+  host: localhost
+  database: db
+  username: root
+  password: root
+  balanceTable: 'scon_surv'
+  coinsTable: 'scon_coins'
+
+#Настройка redis хранилища
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  database: 0
+  #Если @useRedisMessagingUpdater: true - то через данный канал будут отправляться пакет-реквесты для обновления данных на других серверах.
+  serverChannel: "simple-economy"
+
+#Максимально допустимый баланс игрока
+maxBalance: 500000
+maxCoins: 100000
+
+#Стартовый баланс игрока, при условии отсутствия данных в базе.
+startBalance: 100
+startCoins: 10
+
+#Минимальная сума денег на балансе игрока, при котором он может совершить перевод через /pay
+minTransactionSum: 100
+
+#Настройки топа.
+playerTop:
+  #Кол-во игроков в топе по монеткам.
+  moneyCount: 10
+  #Кол-во игроков в топе по коинам.
+  coinsCount: 10
+  #Время обновления топов
+  updateInterval: 1m
+  topFormat: "(index). (player) (balance)"
+
+currencyFormat:
+  plural: 'монетки'
+  singular: 'монета'
+  plural2: 'монеток'
+
+currencyCoinsFormat:
+  plural: 'коины'
+  singular: 'коин'
+  plural2: 'коинов'

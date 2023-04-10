@@ -1,0 +1,46 @@
+package ua.klesaak.simpleconomy;
+
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.annotation.command.Command;
+import org.bukkit.plugin.java.annotation.command.Commands;
+import org.bukkit.plugin.java.annotation.dependency.Dependency;
+import org.bukkit.plugin.java.annotation.dependency.LoadBefore;
+import org.bukkit.plugin.java.annotation.dependency.LoadBeforePlugins;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.permission.Permission;
+import org.bukkit.plugin.java.annotation.permission.Permissions;
+import org.bukkit.plugin.java.annotation.plugin.Description;
+import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.author.Author;
+import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+
+@Plugin(name = "SimpleConomy", version = "0.1")
+@Author("Klesaak")
+@Dependency("Vault")
+@SoftDependency("PlaceholderAPI")
+@LoadBeforePlugins({@LoadBefore("Vault"), @LoadBefore("PlaceholderAPI")})
+@Commands({
+        @Command(name = "sconomy", aliases = {"scon", "seco"}, desc = "Admin command."),
+        @Command(name = "balance", aliases = {"money", "emoney", "ebalance", "ebal", "eco", "coins"}, desc = "Command to check your balance."),
+        @Command(name = "baltop", aliases = "ebaltop", desc = "Command to check your balance."),
+        @Command(name = "pay", aliases  = {"epay", "wpay"}, desc = "Player money transaction command.")
+})
+@Description("Simple high performance economy plugin.")
+@Permissions({
+        @Permission(name = "simpleconomy.admin", defaultValue = PermissionDefault.OP, desc = "Access to use admin command.")
+})
+
+public class SimpleConomyPlugin extends JavaPlugin {
+    private SimpleEconomyManager manager;
+
+    @Override
+    public void onEnable() {
+        this.manager = new SimpleEconomyManager(this);
+    }
+
+    @Override
+    public void onDisable() {
+        this.manager.disable();
+    }
+}

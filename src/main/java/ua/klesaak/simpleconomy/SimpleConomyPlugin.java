@@ -21,7 +21,7 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 @SoftDependency("PlaceholderAPI")
 @LoadBeforePlugins({@LoadBefore("Vault"), @LoadBefore("PlaceholderAPI")})
 @Commands({
-        @Command(name = "sconomy", aliases = {"scon", "seco"}, desc = "Admin command."),
+        @Command(name = "sconomy", aliases = {"scon", "seco"}, desc = "Admin command.", permission = "simpleconomy.admin"),
         @Command(name = "balance", aliases = {"money", "emoney", "ebalance", "ebal", "eco", "coins"}, desc = "Command to check your balance."),
         @Command(name = "baltop", aliases = "ebaltop", desc = "Command to check your balance."),
         @Command(name = "pay", aliases  = {"epay", "wpay"}, desc = "Player money transaction command.")

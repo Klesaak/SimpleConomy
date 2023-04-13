@@ -3,6 +3,7 @@ package ua.klesaak.simpleconomy.manager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
+import ua.klesaak.simpleconomy.commands.AdminCommands;
 import ua.klesaak.simpleconomy.configurations.ConfigFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
 import ua.klesaak.simpleconomy.storage.IStorage;
@@ -26,9 +27,10 @@ public class SimpleEconomyManager {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new PAPIExpansion(this);
         this.configFile = new ConfigFile(this.plugin);
         new VaultEconomyHook(this);
+
+        //================COMMANDS================\\
+        new AdminCommands(this);
     }
-
-
 
     public void disable() {
 

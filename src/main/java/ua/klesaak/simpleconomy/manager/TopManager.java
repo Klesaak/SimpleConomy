@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedList;
 
 public class TopManager {
-    private LinkedList<PlayerData> moneyTop, coinsTop;
+    private LinkedList<String> moneyTop, coinsTop;
     private final SimpleEconomyManager manager;
     private BukkitTask updateTask;
 
@@ -19,7 +19,7 @@ public class TopManager {
 
     public void startUpdateTask(int topUpdateInterval) {
         this.updateTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.manager.getPlugin(), ()-> {
-
+            //todo
         }, topUpdateInterval, topUpdateInterval);
     }
 }

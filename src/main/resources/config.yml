@@ -4,6 +4,11 @@ storage: file
 #Использовать ли redis pub-sub технологию для отправки пакета-обновления данных всем плагинам экономики.
 useRedisMessagingUpdater: false
 
+#Настройка file хранилища
+file:
+  fileName: "storage"
+  savePeriod: 20s
+
 #Настройка mysql хранилища
 mysql:
   host: localhost

@@ -7,6 +7,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.concurrent.TimeUnit;
 
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -40,11 +44,32 @@ public class ConfigFile extends PluginConfig {
         this.currencyCoinsFormatPlural2 = this.getString("currencyCoinsFormat.plural2");
     }
 
+    public ConfigurationSection getFileSection() {
+        return this.getConfigurationSection("file");
+    }
+
     public ConfigurationSection getMySQLSection() {
         return this.getConfigurationSection("mysql");
     }
 
     public ConfigurationSection getRedisSection() {
         return this.getConfigurationSection("redis");
+    }
+
+    public String format(double amount) {
+        return format(BigDecimal.valueOf(amount), 2);
+    }
+
+    private String format(BigDecimal amount, int scale) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
+        DecimalFormat format = new DecimalFormat();
+        format.setRoundingMode(RoundingMode.HALF_EVEN);
+        format.setGroupingUsed(true);
+        format.setMinimumFractionDigits(0);
+        format.setMaximumFractionDigits(scale);
+        format.setDecimalFormatSymbols(symbols);
+        return format.format(amount);
     }
 }

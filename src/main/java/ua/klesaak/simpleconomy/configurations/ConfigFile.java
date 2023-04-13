@@ -57,10 +57,10 @@ public class ConfigFile extends PluginConfig {
     }
 
     public String format(double amount) {
-        return format(BigDecimal.valueOf(amount), 2);
+        return format(BigDecimal.valueOf(amount));
     }
 
-    private String format(BigDecimal amount, int scale) {
+    private String format(BigDecimal amount) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
         symbols.setDecimalSeparator('.');
         symbols.setGroupingSeparator(',');
@@ -68,7 +68,7 @@ public class ConfigFile extends PluginConfig {
         format.setRoundingMode(RoundingMode.HALF_EVEN);
         format.setGroupingUsed(true);
         format.setMinimumFractionDigits(0);
-        format.setMaximumFractionDigits(scale);
+        format.setMaximumFractionDigits(2);
         format.setDecimalFormatSymbols(symbols);
         return format.format(amount);
     }

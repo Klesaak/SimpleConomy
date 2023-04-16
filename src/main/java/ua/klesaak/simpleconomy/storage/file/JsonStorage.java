@@ -3,15 +3,13 @@ package ua.klesaak.simpleconomy.storage.file;
 import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.IStorage;
-import ua.klesaak.simpleconomy.storage.SCListener;
 
 import java.util.Collection;
 
-public class JsonStorage extends SCListener implements IStorage {
+public class JsonStorage implements IStorage {
     private final SimpleEconomyManager manager;
 
     public JsonStorage(SimpleEconomyManager manager) {
-        super(manager.getPlugin());
         this.manager = manager;
     }
 
@@ -23,6 +21,16 @@ public class JsonStorage extends SCListener implements IStorage {
 
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
+
+    }
+
+    @Override
+    public void cachePlayer(String nickName) {
+
+    }
+
+    @Override
+    public void unCachePlayer(String nickName) {
 
     }
 

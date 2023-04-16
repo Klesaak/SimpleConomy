@@ -1,6 +1,5 @@
 package ua.klesaak.simpleconomy.commands;
 
-import lombok.val;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AdminCommands implements CommandExecutor, TabCompleter {
+    private static final List<String> SUB_COMMANDS0 = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "delacc");
     private final SimpleEconomyManager manager;
 
     public AdminCommands(SimpleEconomyManager manager) {
@@ -83,8 +83,7 @@ public class AdminCommands implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            val subCommands = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "delacc");
-            return UtilityMethods.copyPartialMatches(args[0].toLowerCase(), subCommands, new ArrayList<>());
+            return UtilityMethods.copyPartialMatches(args[0].toLowerCase(), SUB_COMMANDS0, new ArrayList<>());
         }
         return Collections.emptyList();
     }

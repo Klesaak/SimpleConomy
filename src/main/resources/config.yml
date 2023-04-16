@@ -12,11 +12,12 @@ file:
 #Настройка mysql хранилища
 mysql:
   host: localhost
+  port: 3306
   database: db
-  username: root
-  password: root
-  balanceTable: 'scon_surv'
-  coinsTable: 'scon_coins'
+  username: mysql
+  password: mysql
+  table: 'scon_surv'
+  useSSL: false
 
 #Настройка redis хранилища
 redis:

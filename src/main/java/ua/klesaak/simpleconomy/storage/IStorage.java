@@ -7,6 +7,8 @@ import java.util.Collection;
 public interface IStorage {
     void init();
     void savePlayer(String nickName, PlayerData playerData);
+    void cachePlayer(String nickName);
+    void unCachePlayer(String nickName);
     boolean hasAccount(String nickName);
 
     //================VAULT================\\

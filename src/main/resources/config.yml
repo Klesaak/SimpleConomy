@@ -45,7 +45,7 @@ playerTop:
   moneyCount: 10
   #Кол-во игроков в топе по коинам.
   coinsCount: 10
-  #Время обновления топов
+  #Интервал обновления топов
   updateInterval: 1m
   topFormat: "(index). (player) (balance)"
 

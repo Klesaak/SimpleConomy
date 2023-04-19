@@ -18,7 +18,7 @@ public class AsyncUpdateContainer<T> {
 
 
     /**
-     * @param object обьект-класс, с которым будем оперировать, например: "PlayerData::new"
+     * @param object объект-класс, с которым будем оперировать, например: "PlayerData::new"
      */
     public AsyncUpdateContainer(Dao<T, ?> dao, ScheduledExecutorService executor, T object) {
         this.dao = dao;
@@ -42,7 +42,7 @@ public class AsyncUpdateContainer<T> {
                 updateScheduled = false;
             }
             try {
-                dao.update(object);
+                dao.createOrUpdate(object);
             } catch (SQLException e) {
                 System.out.println("Unable to save sql data: " + e);
             }

@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedList;
 
 public class TopManager {
-    private LinkedList<String> moneyTop, coinsTop;
+    private final LinkedList<String> moneyTop, coinsTop;
     private final SimpleEconomyManager manager;
     private BukkitTask updateTask;
 
@@ -14,12 +14,14 @@ public class TopManager {
         this.manager = manager;
         this.moneyTop = new LinkedList<>();
         this.coinsTop = new LinkedList<>();
-        this.startUpdateTask(topUpdateInterval);
+        this.startUpdateTask(moneyTopCount, coinsTopCount, topUpdateInterval);
     }
 
-    public void startUpdateTask(int topUpdateInterval) {
+    public void startUpdateTask(int moneyTopCount, int coinsTopCount, int topUpdateInterval) {
         this.updateTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.manager.getPlugin(), ()-> {
-            //todo
+            this.coinsTop.clear();
+            this.moneyTop.clear();;
+            //todo заполнять списки уже отформатированными топами
         }, topUpdateInterval, topUpdateInterval);
     }
 }

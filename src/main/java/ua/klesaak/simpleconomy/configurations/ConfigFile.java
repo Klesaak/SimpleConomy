@@ -6,11 +6,13 @@ import lombok.experimental.FieldDefaults;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
+import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -34,14 +36,22 @@ public class ConfigFile extends PluginConfig {
         this.minTransactionSum = this.getInt("minTransactionSum");
         this.playerTopMoneyCount = this.getInt("playerTop.moneyCount");
         this.playerTopCoinsCount = this.getInt("playerTop.coinsCount");
-        this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(this.getString("playerTop.updateInterval"), TimeUnit.SECONDS) / 20);
-        this.topFormat = this.getString("playerTop.topFormat");
+        this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) / 20);
+        this.topFormat = UtilityMethods.color(this.getString("playerTop.topFormat"));
         this.currencyFormatPlural = this.getString("currencyFormat.plural");
         this.currencyFormatSingular = this.getString("currencyFormat.singular");
         this.currencyFormatPlural2 = this.getString("currencyFormat.plural2");
         this.currencyCoinsFormatPlural = this.getString("currencyCoinsFormat.plural");
         this.currencyCoinsFormatSingular = this.getString("currencyCoinsFormat.singular");
         this.currencyCoinsFormatPlural2 = this.getString("currencyCoinsFormat.plural2");
+    }
+
+    public String formatTopLine(String index, String player, String balance) {
+        String format = this.topFormat;
+        format = UtilityMethods.replaceAll(MessagesFile.INDEX_PATTERN, format, ()-> index);
+        format = UtilityMethods.replaceAll(MessagesFile.PLAYER_PATTERN, format, ()-> player);
+        format = UtilityMethods.replaceAll(MessagesFile.BALANCE_PATTERN, format, ()-> balance);
+        return format;
     }
 
     public ConfigurationSection getFileSection() {

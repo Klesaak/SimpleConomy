@@ -1,4 +1,20 @@
 package ua.klesaak.simpleconomy.commands;
 
-public class PayCommand {
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
+
+public class PayCommand extends AbstractBukkitCommand {
+    private final SimpleEconomyManager manager;
+
+    public PayCommand(SimpleEconomyManager manager) {
+        this.manager = manager;
+        this.manager.getPlugin().getCommand("pay").setExecutor(this);
+    }
+
+    @Override
+    public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
+
+    }
 }

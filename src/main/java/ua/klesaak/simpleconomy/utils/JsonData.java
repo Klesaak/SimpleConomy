@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.utils.json;
+package ua.klesaak.simpleconomy.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

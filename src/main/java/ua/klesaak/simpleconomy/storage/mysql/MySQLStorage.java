@@ -22,8 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,8 +32,7 @@ public class MySQLStorage implements IStorage {
     Cache<String, AsyncUpdateContainer<PlayerData>> temporalCache = CacheBuilder.newBuilder()
             .initialCapacity(Bukkit.getMaxPlayers())
             .concurrencyLevel(16)
-            .expireAfterWrite(120, TimeUnit.SECONDS).build(); //Временный кеш, чтобы уменьшить кол-во запросов в бд при оффлайн игроке.
-    Map<String, AsyncUpdateContainer<PlayerData>> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
+            .expireAfterWrite(1, TimeUnit.MINUTES).build(); //Временный кеш, чтобы уменьшить кол-во запросов в бд.
     JdbcPooledConnectionSource connectionSource;
     Dao<PlayerData, String> playerDataDao;
     SimpleEconomyManager manager;
@@ -55,8 +52,8 @@ public class MySQLStorage implements IStorage {
             moneyField.setDataType(DataType.DOUBLE);
             fieldConfigs.add(moneyField);
             DatabaseFieldConfig coinsField = new DatabaseFieldConfig("coins");
-            moneyField.setDataType(DataType.BIG_INTEGER);
-            moneyField.setCanBeNull(false);
+            coinsField.setDataType(DataType.INTEGER);
+            coinsField.setCanBeNull(false);
             fieldConfigs.add(coinsField);
             DatabaseTableConfig<PlayerData> accountTableConfig = new DatabaseTableConfig<>(PlayerData.class, config.getTable(), fieldConfigs);
             this.connectionSource = new JdbcPooledConnectionSource(config.getHost());
@@ -68,86 +65,124 @@ public class MySQLStorage implements IStorage {
         this.connectionSource.setTestBeforeGet(true);
     }
 
+    @SneakyThrows(SQLException.class)
+    public AsyncUpdateContainer<PlayerData> getPlayerContainer(String nickName) {
+        val temporalContainer = this.temporalCache.getIfPresent(nickName);
+        if (temporalContainer != null) return temporalContainer;
+        PlayerData playerData = this.playerDataDao.queryForId(nickName);
+        if (playerData == null) {
+            playerData = new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        }
+        AsyncUpdateContainer<PlayerData> container = new AsyncUpdateContainer<>(this.playerDataDao, this.scheduledExecutor, playerData);
+        this.temporalCache.put(nickName, container);
+        return container;
+    }
+
     @Override
     public void init() {}
 
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
-
+        AsyncUpdateContainer<PlayerData> container = this.temporalCache.getIfPresent(nickName);
+        if (container != null) container.scheduleUpdate();
     }
 
     @Override
     public void cachePlayer(String nickName) {
-
+        this.getPlayer(nickName);
     }
 
     @Override
     public void unCachePlayer(String nickName) {
-
+        this.temporalCache.invalidate(nickName);
     }
 
-    @Override
+    @Override @SneakyThrows(SQLException.class)
     public boolean hasAccount(String nickName) {
-        return false;
+        val temporalContainer = this.temporalCache.getIfPresent(nickName);
+        if (temporalContainer != null) return true;
+        PlayerData playerData = this.playerDataDao.queryForId(nickName);
+        System.out.println("S-ECON-DEBUG: MySQLStorage.class, hasAccount method has been called.");
+        return playerData != null;
     }
 
     @Override
     public double getMoneyBalance(String nickName) {
-        return 0;
+        return this.getPlayer(nickName).getMoney();
     }
 
     @Override
     public boolean hasMoney(String nickName, double amount) {
-        return false;
+        return this.getPlayer(nickName).getMoney() >= amount;
     }
 
     @Override
-    public boolean withdrawMoney(String nickName, double amount) {
-        return false;
+    public boolean withdrawMoney(String nickName, double amount) {//todo чекать существование аккаунта
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().withdrawMoney(amount);
+        container.scheduleUpdate();
+        return true;
     }
 
     @Override
-    public boolean depositMoney(String nickName, double amount) {
-        return false;
+    public boolean depositMoney(String nickName, double amount) {//todo чекать существование аккаунта
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().depositMoney(amount);
+        container.scheduleUpdate();
+        return true;
     }
 
     @Override
     public int getCoinsBalance(String nickName) {
-        return 0;
+        return this.getPlayer(nickName).getCoins();
     }
 
     @Override
     public boolean hasCoins(String nickName, int amount) {
-        return false;
+        return this.getPlayer(nickName).getCoins() >= amount;
     }
 
     @Override
-    public boolean withdrawCoins(String nickName, int amount) {
-        return false;
+    public boolean withdrawCoins(String nickName, int amount) {//todo чекать существование аккаунта
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().withdrawCoins(amount);
+        container.scheduleUpdate();
+        return true;
     }
 
     @Override
-    public boolean depositCoins(String nickName, int amount) {
-        return false;
+    public boolean depositCoins(String nickName, int amount) {//todo чекать существование аккаунта
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().depositCoins(amount);
+        container.scheduleUpdate();
+        return true;
     }
 
     @Override
     public boolean createAccount(String nickName) {
-        return false;
+        System.out.println("S-ECON-DEBUG: MySQLStorage.class, createAccount method has been called.");
+        return true;
     }
 
-    @Override
+    @Override @SneakyThrows(SQLException.class)
     public PlayerData getPlayer(String nickName) {
+        val temporalContainer = this.temporalCache.getIfPresent(nickName);
+        if (temporalContainer != null) return temporalContainer.getObject();
+        PlayerData playerData = this.playerDataDao.queryForId(nickName);
+        if (playerData == null) {
+            playerData = new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        }
+        this.temporalCache.put(nickName, new AsyncUpdateContainer<>(this.playerDataDao, this.scheduledExecutor, playerData));
+        return playerData;
+    }
+
+    @Override
+    public Collection<String> getMoneyTop(int amount) {
         return null;
     }
 
     @Override
-    public Collection<PlayerData> getMoneyTop(int amount) {
-        return null;
-    }
-
-    @Override
-    public Collection<PlayerData> getCoinsTop(int amount) {
+    public Collection<String> getCoinsTop(int amount) {
         return null;
     }
 

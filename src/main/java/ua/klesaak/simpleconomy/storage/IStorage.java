@@ -26,8 +26,8 @@ public interface IStorage {
     boolean createAccount(String nickName);
     PlayerData getPlayer(String nickName);
 
-    Collection<PlayerData> getMoneyTop(int amount);
-    Collection<PlayerData> getCoinsTop(int amount);
+    Collection<String> getMoneyTop(int amount);
+    Collection<String> getCoinsTop(int amount);
 
     void close();
 }

@@ -94,12 +94,12 @@ public class RedisStorage implements IStorage {
     }
 
     @Override
-    public Collection<PlayerData> getMoneyTop(int amount) {
+    public Collection<String> getMoneyTop(int amount) {
         return null;
     }
 
     @Override
-    public Collection<PlayerData> getCoinsTop(int amount) {
+    public Collection<String> getCoinsTop(int amount) {
         return null;
     }
 

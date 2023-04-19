@@ -1,16 +1,30 @@
 package ua.klesaak.simpleconomy.storage.file;
 
+import com.google.gson.reflect.TypeToken;
+import lombok.Synchronized;
+import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.IStorage;
+import ua.klesaak.simpleconomy.utils.JsonData;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JsonStorage implements IStorage {
     private final SimpleEconomyManager manager;
+    Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
+    private JsonData storage;
 
     public JsonStorage(SimpleEconomyManager manager) {
         this.manager = manager;
+        this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
+        if (storage.getFile().length() > 0L) {
+            this.playersCache = storage.readAll(new TypeToken<Map<String, PlayerData>>(){});
+        }
     }
 
 
@@ -19,43 +33,47 @@ public class JsonStorage implements IStorage {
 
     }
 
-    @Override
+    @Override @Synchronized
     public void savePlayer(String nickName, PlayerData playerData) {
-
+        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache, true));
     }
 
     @Override
     public void cachePlayer(String nickName) {
-
+        //empty
     }
 
     @Override
     public void unCachePlayer(String nickName) {
-
+        //empty
     }
 
     @Override
     public boolean hasAccount(String nickName) {
-        return false;
+        return this.playersCache.containsKey(nickName);
     }
 
     @Override
     public double getMoneyBalance(String nickName) {
-        return 0;
+        if (this.hasAccount(nickName)) return this.playersCache.get(nickName).getMoney();
+        return manager.getConfigFile().getStartBalance();
     }
 
     @Override
     public boolean hasMoney(String nickName, double amount) {
-        return false;
+        if (this.hasAccount(nickName)) return this.playersCache.get(nickName).getMoney() >= amount;
+        return manager.getConfigFile().getStartBalance() >= amount;
     }
 
     @Override
     public boolean withdrawMoney(String nickName, double amount) {
-        return false;
+
+        return true;
     }
 
     @Override
     public boolean depositMoney(String nickName, double amount) {
+
         return false;
     }
 
@@ -90,12 +108,12 @@ public class JsonStorage implements IStorage {
     }
 
     @Override
-    public Collection<PlayerData> getMoneyTop(int amount) {
+    public Collection<String> getMoneyTop(int amount) {
         return null;
     }
 
     @Override
-    public Collection<PlayerData> getCoinsTop(int amount) {
+    public Collection<String> getCoinsTop(int amount) {
         return null;
     }
 

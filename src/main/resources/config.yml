@@ -1,5 +1,5 @@
 #Доступные хранилища: mysql, redis, file
-storage: file
+storage: mysql
 
 #Использовать ли redis pub-sub технологию для отправки пакета-обновления данных всем плагинам экономики.
 useRedisMessagingUpdater: false

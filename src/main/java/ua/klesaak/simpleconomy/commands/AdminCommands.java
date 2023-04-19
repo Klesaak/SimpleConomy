@@ -1,11 +1,12 @@
 package ua.klesaak.simpleconomy.commands;
 
+import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AdminCommands implements CommandExecutor, TabCompleter {
+public class AdminCommands extends AbstractBukkitCommand implements TabCompleter {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "delacc");
     private final SimpleEconomyManager manager;
 
@@ -23,12 +24,11 @@ public class AdminCommands implements CommandExecutor, TabCompleter {
         this.manager.getPlugin().getCommand("sconomy").setTabCompleter(this);
     }
 
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("simpleconomy.admin")) {
-            sender.sendMessage(ChatColor.GOLD + manager.getPlugin().getDescription().getName() + " v" + manager.getPlugin().getDescription().getVersion() + ChatColor.RED + " by Klesaak");
-            return true;
-        }
+    public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
+        this.cmdVerifyPermission(sender, "simpleconomy.admin", ChatColor.RED + "Нет прав.");
+        String label = command.getLabel();
         if (args.length == 0) {
             sender.sendMessage(ChatColor.GOLD + manager.getPlugin().getDescription().getName() + " v" + manager.getPlugin().getDescription().getVersion() + ChatColor.RED + " by Klesaak");
             sender.sendMessage("");
@@ -40,12 +40,12 @@ public class AdminCommands implements CommandExecutor, TabCompleter {
             sender.sendMessage(ChatColor.GOLD + "/" + label + " setmoney <ник> <сумма> - установить деньги.");
             sender.sendMessage(ChatColor.GOLD + "/" + label + " setcoins <ник> <сумма> - установить коины.");
             sender.sendMessage(ChatColor.GOLD + "/" + label + " delacc <ник> - удалить аккаунт.");
-            return true;
+            return;
         }
 
-        switch (args[0]) {
+        switch (args[0].toLowerCase()) {
             case "reload": {
-                sender.sendMessage(ChatColor.GREEN + manager.getPlugin().getDescription().getName() + " reloaded!");
+                sender.sendMessage(this.manager.reload());
                 break;
             }
             case "addmoney": {
@@ -77,11 +77,10 @@ public class AdminCommands implements CommandExecutor, TabCompleter {
                 break;
             }
         }
-        return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String[] args) {
         if (args.length == 1) {
             return UtilityMethods.copyPartialMatches(args[0].toLowerCase(), SUB_COMMANDS0, new ArrayList<>());
         }

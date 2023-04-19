@@ -28,7 +28,8 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 })
 @Description("Simple high performance economy plugin.")
 @Permissions({
-        @Permission(name = "simpleconomy.admin", defaultValue = PermissionDefault.OP, desc = "Access to use admin command.")
+        @Permission(name = "simpleconomy.admin", defaultValue = PermissionDefault.OP, desc = "Access to use admin command."),
+        @Permission(name = "simpleconomy.others", defaultValue = PermissionDefault.OP, desc = "Access to check other player balance.")
 })
 
 public class SimpleConomyPlugin extends JavaPlugin {

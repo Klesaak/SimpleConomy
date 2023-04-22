@@ -66,7 +66,7 @@ public class MySQLStorage implements IStorage {
     }
 
     @SneakyThrows(SQLException.class)
-    public AsyncUpdateContainer<PlayerData> getPlayerContainer(String nickName) {
+    private AsyncUpdateContainer<PlayerData> getPlayerContainer(String nickName) {
         val temporalContainer = this.temporalCache.getIfPresent(nickName);
         if (temporalContainer != null) return temporalContainer;
         PlayerData playerData = this.playerDataDao.queryForId(nickName);
@@ -102,7 +102,6 @@ public class MySQLStorage implements IStorage {
         val temporalContainer = this.temporalCache.getIfPresent(nickName);
         if (temporalContainer != null) return true;
         PlayerData playerData = this.playerDataDao.queryForId(nickName);
-        System.out.println("S-ECON-DEBUG: MySQLStorage.class, hasAccount method has been called.");
         return playerData != null;
     }
 
@@ -117,7 +116,7 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
-    public boolean withdrawMoney(String nickName, double amount) {//todo чекать существование аккаунта
+    public boolean withdrawMoney(String nickName, double amount) {
         val container = this.getPlayerContainer(nickName);
         container.getObject().withdrawMoney(amount);
         container.scheduleUpdate();
@@ -125,7 +124,7 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
-    public boolean depositMoney(String nickName, double amount) {//todo чекать существование аккаунта
+    public boolean depositMoney(String nickName, double amount) {
         val container = this.getPlayerContainer(nickName);
         container.getObject().depositMoney(amount);
         container.scheduleUpdate();
@@ -143,7 +142,7 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
-    public boolean withdrawCoins(String nickName, int amount) {//todo чекать существование аккаунта
+    public boolean withdrawCoins(String nickName, int amount) {
         val container = this.getPlayerContainer(nickName);
         container.getObject().withdrawCoins(amount);
         container.scheduleUpdate();
@@ -151,7 +150,7 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
-    public boolean depositCoins(String nickName, int amount) {//todo чекать существование аккаунта
+    public boolean depositCoins(String nickName, int amount) {
         val container = this.getPlayerContainer(nickName);
         container.getObject().depositCoins(amount);
         container.scheduleUpdate();

@@ -2,7 +2,6 @@ package ua.klesaak.simpleconomy.commands;
 
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,7 +21,7 @@ public class BalanceCommand extends AbstractBukkitCommand {
         Player playerSender = this.cmdVerifyPlayer(sender);
         if (args.length == 0) {
             val pd = manager.getStorage().getPlayer(playerSender.getName().toLowerCase());
-            manager.getMessagesFile().sendBalanceInfo(playerSender, manager.getConfigFile().format(pd.getMoney()), String.valueOf(pd.getCoins()));
+            manager.getMessagesFile().sendBalanceInfo(playerSender, manager.getConfigFile().format(pd.getMoney()), String.valueOf(pd.getCoins())); //todo NumberUtils
             return;
         }
         if (args.length == 1 && sender.hasPermission("simpleconomy.others")) {

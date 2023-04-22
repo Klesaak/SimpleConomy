@@ -14,9 +14,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class JsonData {
     public static Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient().create();
-    @Getter private final File file;
+    private final File file;
 
     @SneakyThrows
     public JsonData(File file) {

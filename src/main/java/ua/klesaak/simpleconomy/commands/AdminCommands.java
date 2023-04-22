@@ -42,38 +42,44 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             sender.sendMessage(ChatColor.GOLD + "/" + label + " delacc <ник> - удалить аккаунт.");
             return;
         }
-
         switch (args[0].toLowerCase()) {
             case "reload": {
                 sender.sendMessage(this.manager.reload());
                 break;
             }
             case "addmoney": {
+                this.cmdVerify(args.length != 3, "§6/" + label + " addmoney <ник> <сумма> - выдать деньги.");
 
                 break;
             }
             case "addcoins": {
-                System.out.println("addcoins");
+                this.cmdVerify(args.length != 3, "§6/" + label + " addcoins <ник> <сумма> - выдать коины.");
+
                 break;
             }
             case "setmoney": {
-                System.out.println("setmoney");
+                this.cmdVerify(args.length != 3, "§6/" + label + " setmoney <ник> <сумма> - установить деньги.");
+
                 break;
             }
             case "setcoins": {
-                System.out.println("setcoins");
+                this.cmdVerify(args.length != 3,"§6/" + label + " setcoins <ник> <сумма> - установить коины.");
+
                 break;
             }
             case "wmoney": {
-                System.out.println("wmoney");
+                this.cmdVerify(args.length != 3, "§6/" + label + " wmoney <ник> <сумма> - забрать деньги.");
+
                 break;
             }
             case "wcoins": {
-                System.out.println("wcoins");
+                this.cmdVerify(args.length != 3,"§6/" + label + " wcoins <ник> <сумма> - забрать коины.");
+
                 break;
             }
             case "delacc": {
-                System.out.println("delacc");
+                this.cmdVerify(args.length != 2, "§6/" + label + " delacc <ник> - удалить аккаунт.");
+
                 break;
             }
         }

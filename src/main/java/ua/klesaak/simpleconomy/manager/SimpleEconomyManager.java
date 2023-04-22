@@ -27,8 +27,8 @@ public class SimpleEconomyManager implements Listener {
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
-    private IStorage storage;
-    private TopManager topManager;
+    private volatile IStorage storage;
+    private volatile TopManager topManager;
 
     public SimpleEconomyManager(SimpleConomyPlugin plugin) {
         this.plugin = plugin;

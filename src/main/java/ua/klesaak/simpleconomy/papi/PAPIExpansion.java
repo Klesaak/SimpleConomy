@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 
+import java.util.Objects;
+
 public class PAPIExpansion extends PlaceholderExpansion {
     private final SimpleEconomyManager manager;
 
@@ -16,7 +18,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 
     @Override
     public boolean canRegister() {
-        SimpleConomyPlugin plugin = (SimpleConomyPlugin) Bukkit.getPluginManager().getPlugin(this.getRequiredPlugin());
+        SimpleConomyPlugin plugin = (SimpleConomyPlugin) Bukkit.getPluginManager().getPlugin(Objects.requireNonNull(this.getRequiredPlugin()));
         return plugin != null;
     }
 

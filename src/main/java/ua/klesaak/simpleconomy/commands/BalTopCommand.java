@@ -1,7 +1,7 @@
 package ua.klesaak.simpleconomy.commands;
 
 import lombok.NonNull;
-import org.bukkit.ChatColor;
+import lombok.val;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -27,17 +27,19 @@ public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter
 
     @Override
     public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
+        val messagesFile = this.manager.getMessagesFile();
+        val topManager = this.manager.getTopManager();
         if (args.length == 0) {
-            this.manager.getMessagesFile().sendMoneyTop(sender, this.manager.getTopManager().getMoneyTop());
+            messagesFile.sendMoneyTop(sender, topManager.getMoneyTop());
             return;
         }
         switch (args[0]) {
             case "money": {
-                this.manager.getMessagesFile().sendMoneyTop(sender, this.manager.getTopManager().getMoneyTop());
+                messagesFile.sendMoneyTop(sender, topManager.getMoneyTop());
                 break;
             }
             case "coins": {
-                this.manager.getMessagesFile().sendCoinsTop(sender, this.manager.getTopManager().getCoinsTop());
+                messagesFile.sendCoinsTop(sender, topManager.getCoinsTop());
                 break;
             }
         }

@@ -6,6 +6,7 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.IStorage;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,6 +65,11 @@ public class RedisStorage implements IStorage {
     }
 
     @Override
+    public boolean setMoney(String nickName, double amount) {
+        return false;
+    }
+
+    @Override
     public int getCoinsBalance(String nickName) {
         return 0;
     }
@@ -84,6 +90,11 @@ public class RedisStorage implements IStorage {
     }
 
     @Override
+    public boolean setCoins(String nickName, int amount) {
+        return false;
+    }
+
+    @Override
     public boolean createAccount(String nickName) {
         return false;
     }
@@ -94,12 +105,17 @@ public class RedisStorage implements IStorage {
     }
 
     @Override
-    public Collection<String> getMoneyTop(int amount) {
+    public void deleteAccount(String nickName) {
+
+    }
+
+    @Override
+    public List<String> getMoneyTop(int amount) {
         return null;
     }
 
     @Override
-    public Collection<String> getCoinsTop(int amount) {
+    public List<String> getCoinsTop(int amount) {
         return null;
     }
 

@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ConfigFile extends PluginConfig {
     String storage;
-    boolean useRedisMessagingUpdater;
     int maxBalance, maxCoins, startBalance, startCoins, minTransactionSum;
     int playerTopMoneyCount, playerTopCoinsCount, playerTopUpdateTickInterval;
     String topFormat;
@@ -28,7 +27,6 @@ public class ConfigFile extends PluginConfig {
     public ConfigFile(JavaPlugin plugin) {
         super(plugin, "config.yml");
         this.storage = this.getString("storage");
-        this.useRedisMessagingUpdater = this.getBoolean("useRedisMessagingUpdater");
         this.maxBalance = this.getInt("maxBalance");
         this.maxCoins = this.getInt("maxCoins");
         this.startBalance = this.getInt("startBalance");
@@ -81,5 +79,13 @@ public class ConfigFile extends PluginConfig {
         format.setMaximumFractionDigits(2);
         format.setDecimalFormatSymbols(symbols);
         return format.format(amount);
+    }
+
+    public String formatMoney(double amount) {
+        return NumberUtils.formatting((int)amount, this.currencyFormatSingular, this.currencyFormatPlural, this.currencyFormatPlural2);
+    }
+
+    public String formatCoins(int amount) {
+        return NumberUtils.formatting(amount, this.currencyCoinsFormatSingular, this.currencyCoinsFormatPlural, this.currencyCoinsFormatPlural2);
     }
 }

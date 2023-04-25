@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseFieldConfig;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTableConfig;
 import com.j256.ormlite.table.TableUtils;
 import lombok.AccessLevel;
@@ -45,13 +46,13 @@ public class MySQLStorage implements IStorage {
             DatabaseFieldConfig playerName = new DatabaseFieldConfig("playerName");
             playerName.setId(true);
             playerName.setCanBeNull(false);
-            playerName.setColumnName("player_name");
+            playerName.setColumnName(MySQLConfig.PLAYER_COLUMN);
             fieldConfigs.add(playerName);
-            DatabaseFieldConfig moneyField = new DatabaseFieldConfig("money");
+            DatabaseFieldConfig moneyField = new DatabaseFieldConfig(MySQLConfig.MONEY_COLUMN);
             moneyField.setCanBeNull(false);
             moneyField.setDataType(DataType.DOUBLE);
             fieldConfigs.add(moneyField);
-            DatabaseFieldConfig coinsField = new DatabaseFieldConfig("coins");
+            DatabaseFieldConfig coinsField = new DatabaseFieldConfig(MySQLConfig.COINS_COLUMN);
             coinsField.setDataType(DataType.INTEGER);
             coinsField.setCanBeNull(false);
             fieldConfigs.add(coinsField);
@@ -132,6 +133,14 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
+    public boolean setMoney(String nickName, double amount) {
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().setMoney(amount);
+        container.scheduleUpdate();
+        return true;
+    }
+
+    @Override
     public int getCoinsBalance(String nickName) {
         return this.getPlayer(nickName).getCoins();
     }
@@ -158,6 +167,14 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
+    public boolean setCoins(String nickName, int amount) {
+        val container = this.getPlayerContainer(nickName);
+        container.getObject().setCoins(amount);
+        container.scheduleUpdate();
+        return true;
+    }
+
+    @Override
     public boolean createAccount(String nickName) {
         System.out.println("S-ECON-DEBUG: MySQLStorage.class, createAccount method has been called.");
         return true;
@@ -175,14 +192,40 @@ public class MySQLStorage implements IStorage {
         return playerData;
     }
 
-    @Override
-    public Collection<String> getMoneyTop(int amount) {
-        return null;
+    @Override @SneakyThrows
+    public void deleteAccount(String nickName) {
+        Runnable run = () -> {
+            try {
+                this.playerDataDao.deleteById(nickName);
+            } catch (SQLException ex) {
+                throw new RuntimeException("Произошла ошибка при удалении данных из MySQL", ex);
+            }
+        };
+        this.scheduledExecutor.execute(run);
     }
 
-    @Override
-    public Collection<String> getCoinsTop(int amount) {
-        return null;
+    @Override @SneakyThrows(SQLException.class)
+    public List<String> getMoneyTop(int amount) {
+        List<String> list = new ArrayList<>(128);
+        QueryBuilder<PlayerData, String> queryBuilder = this.playerDataDao.queryBuilder();
+        queryBuilder.selectColumns(MySQLConfig.PLAYER_COLUMN, MySQLConfig.MONEY_COLUMN).orderBy(MySQLConfig.MONEY_COLUMN, false).limit((long)amount);
+        List<PlayerData> rs = queryBuilder.query();
+        for (val data : rs) {
+            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getMoney())));
+        }
+        return list;
+    }
+
+    @Override @SneakyThrows(SQLException.class)
+    public List<String> getCoinsTop(int amount) {
+        List<String> list = new ArrayList<>(128);
+        QueryBuilder<PlayerData, String> queryBuilder = this.playerDataDao.queryBuilder();
+        queryBuilder.selectColumns(MySQLConfig.PLAYER_COLUMN, MySQLConfig.COINS_COLUMN).orderBy(MySQLConfig.COINS_COLUMN, false).limit((long)amount);
+        List<PlayerData> rs = queryBuilder.query();
+        for (val data : rs) {
+            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getCoins())));
+        }
+        return list;
     }
 
     @Override @SneakyThrows

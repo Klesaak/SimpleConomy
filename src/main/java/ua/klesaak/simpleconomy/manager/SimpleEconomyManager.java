@@ -10,7 +10,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
 import ua.klesaak.simpleconomy.commands.AdminCommands;
+import ua.klesaak.simpleconomy.commands.BalTopCommand;
 import ua.klesaak.simpleconomy.commands.BalanceCommand;
+import ua.klesaak.simpleconomy.commands.PayCommand;
 import ua.klesaak.simpleconomy.configurations.ConfigFile;
 import ua.klesaak.simpleconomy.configurations.MessagesFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
@@ -22,13 +24,18 @@ import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 import java.util.logging.Level;
 
+//todo нормальный reload
+//todo redis, json
+//todo papi
+
+
 @Getter
 public class SimpleEconomyManager implements Listener {
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
     private volatile IStorage storage;
-    private volatile TopManager topManager;
+    private TopManager topManager;
 
     public SimpleEconomyManager(SimpleConomyPlugin plugin) {
         this.plugin = plugin;
@@ -46,6 +53,9 @@ public class SimpleEconomyManager implements Listener {
         //================COMMANDS================\\
         new AdminCommands(this);
         new BalanceCommand(this);
+        new BalTopCommand(this);
+        new PayCommand(this);
+        //================COMMANDS================\\
         this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
     }
 

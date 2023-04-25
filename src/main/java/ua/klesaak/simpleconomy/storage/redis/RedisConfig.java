@@ -12,7 +12,7 @@ import redis.clients.jedis.exceptions.JedisException;
 
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RedisConfig {
-    String address, password, serverChanel;
+    String address, password;
     int port, database;
 
     public RedisConfig(ConfigurationSection configurationSection) {
@@ -20,7 +20,6 @@ public class RedisConfig {
         this.port = configurationSection.getInt("port");
         this.database = configurationSection.getInt("database");
         this.password = configurationSection.getString("password");
-        this.serverChanel = configurationSection.getString("serverChannel");
     }
 
     public RedisPool newRedisPool() throws JedisException {

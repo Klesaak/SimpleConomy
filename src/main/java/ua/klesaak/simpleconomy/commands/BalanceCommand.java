@@ -19,19 +19,21 @@ public class BalanceCommand extends AbstractBukkitCommand {
     @Override
     public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
+        val configFile = manager.getConfigFile();
+        val messagesFile = manager.getMessagesFile();
         if (args.length == 0) {
             val pd = manager.getStorage().getPlayer(playerSender.getName().toLowerCase());
-            manager.getMessagesFile().sendBalanceInfo(playerSender, manager.getConfigFile().format(pd.getMoney()), String.valueOf(pd.getCoins())); //todo NumberUtils
+            messagesFile.sendBalanceInfo(playerSender, configFile.formatMoney(pd.getMoney()), configFile.formatCoins(pd.getCoins()));
             return;
         }
         if (args.length == 1 && sender.hasPermission("simpleconomy.others")) {
             String name = args[0];
             if (Bukkit.getPlayerExact(name) != null) {
                 val otherPD = manager.getStorage().getPlayer(name.toLowerCase());
-                manager.getMessagesFile().sendBalanceInfoOther(playerSender, name, manager.getConfigFile().format(otherPD.getMoney()), String.valueOf(otherPD.getCoins()));
+                messagesFile.sendBalanceInfoOther(playerSender, name, configFile.formatMoney(otherPD.getMoney()), configFile.formatCoins(otherPD.getCoins()));
                 return;
             }
-            manager.getMessagesFile().sendPlayerNotFound(playerSender);
+            messagesFile.sendPlayerNotFound(playerSender);
         }
     }
 }

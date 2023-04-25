@@ -49,7 +49,7 @@ public abstract class AbstractBukkitCommand implements CommandExecutor {
     }
 
     public void cmdVerify(boolean predicate, String usage) {
-        if (!predicate) {
+        if (predicate) {
             throw new RuntimeException(ChatColor.RED + usage);
         }
     }

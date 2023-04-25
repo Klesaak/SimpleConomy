@@ -1,6 +1,7 @@
 package ua.klesaak.simpleconomy.commands;
 
 import lombok.NonNull;
+import lombok.val;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,16 +33,19 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
         if (args.length == 0) {
             sender.sendMessage(ChatColor.GOLD + manager.getPlugin().getDescription().getName() + " v" + manager.getPlugin().getDescription().getVersion() + ChatColor.RED + " by Klesaak");
             sender.sendMessage("");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " reload - перезагрузить конфиги.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " addmoney <ник> <сумма> - выдать деньги.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " addcoins <ник> <сумма> - выдать коины.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " wmoney <ник> <сумма> - забрать деньги.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " wcoins <ник> <сумма> - забрать коины.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " setmoney <ник> <сумма> - установить деньги.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " setcoins <ник> <сумма> - установить коины.");
-            sender.sendMessage(ChatColor.GOLD + "/" + label + " delacc <ник> - удалить аккаунт.");
+            sender.sendMessage("§6/" + label + " reload - перезагрузить конфиги.");
+            sender.sendMessage("§6/" + label + " addmoney <ник> <сумма> - выдать деньги.");
+            sender.sendMessage("§6/" + label + " addcoins <ник> <сумма> - выдать коины.");
+            sender.sendMessage("§6/" + label + " wmoney <ник> <сумма> - забрать деньги.");
+            sender.sendMessage("§6/" + label + " wcoins <ник> <сумма> - забрать коины.");
+            sender.sendMessage("§6/" + label + " setmoney <ник> <сумма> - установить деньги.");
+            sender.sendMessage("§6/" + label + " setcoins <ник> <сумма> - установить коины.");
+            sender.sendMessage("§6/" + label + " delacc <ник> - удалить аккаунт.");
             return;
         }
+        val storage = this.manager.getStorage();
+        val config = this.manager.getConfigFile();
+        val messagesFile = this.manager.getMessagesFile();
         switch (args[0].toLowerCase()) {
             case "reload": {
                 sender.sendMessage(this.manager.reload());
@@ -49,37 +53,81 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "addmoney": {
                 this.cmdVerify(args.length != 3, "§6/" + label + " addmoney <ник> <сумма> - выдать деньги.");
-
+                val nickName = args[1].toLowerCase();
+                val money = this.cmdVerifyInt(args[2]);
+                if (storage.getPlayer(nickName).getMoney() + money > config.getMaxBalance()) {
+                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    return;
+                }
+                storage.depositMoney(nickName, money);
+                messagesFile.sendVaultAddMoney(sender, nickName, config.formatMoney(money));
                 break;
             }
             case "addcoins": {
                 this.cmdVerify(args.length != 3, "§6/" + label + " addcoins <ник> <сумма> - выдать коины.");
-
+                val nickName = args[1].toLowerCase();
+                val coins = this.cmdVerifyInt(args[2]);
+                if (storage.getPlayer(nickName).getCoins() + coins > config.getMaxCoins()) {
+                    sender.sendMessage("§cБаланс коинов превысит максимально допустимый.");
+                    return;
+                }
+                storage.depositCoins(nickName, coins);
+                messagesFile.sendCoinsAddMoney(sender, nickName, config.formatCoins(coins));
                 break;
             }
             case "setmoney": {
                 this.cmdVerify(args.length != 3, "§6/" + label + " setmoney <ник> <сумма> - установить деньги.");
-
+                val nickName = args[1].toLowerCase();
+                val money = this.cmdVerifyInt(args[2]);
+                if (money > config.getMaxBalance()) {
+                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    return;
+                }
+                storage.setMoney(nickName, money);
+                messagesFile.sendVaultSetMoney(sender, nickName, config.formatMoney(money));
                 break;
             }
             case "setcoins": {
                 this.cmdVerify(args.length != 3,"§6/" + label + " setcoins <ник> <сумма> - установить коины.");
-
+                val nickName = args[1].toLowerCase();
+                val coins = this.cmdVerifyInt(args[2]);
+                if (coins > config.getMaxCoins()) {
+                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    return;
+                }
+                storage.setCoins(nickName, coins);
+                messagesFile.sendCoinsSetMoney(sender, nickName, config.formatCoins(coins));
                 break;
             }
             case "wmoney": {
                 this.cmdVerify(args.length != 3, "§6/" + label + " wmoney <ник> <сумма> - забрать деньги.");
-
+                val nickName = args[1].toLowerCase();
+                val money = this.cmdVerifyInt(args[2]);
+                if (storage.getPlayer(nickName).getMoney() - money < 0) {
+                    sender.sendMessage("§cБаланс игрока не может быть меньше ноля.");
+                    return;
+                }
+                storage.withdrawMoney(nickName, money);
+                messagesFile.sendVaultSenderWithdrawn(sender, nickName, config.formatMoney(money));
                 break;
             }
             case "wcoins": {
                 this.cmdVerify(args.length != 3,"§6/" + label + " wcoins <ник> <сумма> - забрать коины.");
-
+                val nickName = args[1].toLowerCase();
+                val coins = this.cmdVerifyInt(args[2]);
+                if (storage.getPlayer(nickName).getCoins() - coins < 0) {
+                    sender.sendMessage("§cБаланс коинов игрока не может быть меньше ноля.");
+                    return;
+                }
+                storage.withdrawCoins(nickName, coins);
+                messagesFile.sendCoinsSenderWithdrawn(sender, nickName, config.formatCoins(coins));
                 break;
             }
             case "delacc": {
                 this.cmdVerify(args.length != 2, "§6/" + label + " delacc <ник> - удалить аккаунт.");
-
+                val nickName = args[1].toLowerCase();
+                storage.deleteAccount(nickName);
+                sender.sendMessage("§6Балансы игрока " + nickName + " успешно сброшены.");
                 break;
             }
         }

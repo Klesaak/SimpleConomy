@@ -7,6 +7,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MySQLConfig {
+    public static final String PLAYER_COLUMN = "player_name";
+    public static final String MONEY_COLUMN = "money";
+    public static final String COINS_COLUMN = "coins";
     int port;
     String username, password, database, address, table;
     boolean isUseSSL;

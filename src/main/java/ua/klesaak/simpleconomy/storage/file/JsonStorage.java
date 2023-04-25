@@ -9,7 +9,7 @@ import ua.klesaak.simpleconomy.storage.IStorage;
 import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +23,7 @@ public class JsonStorage implements IStorage {
         this.manager = manager;
         this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
         if (storage.getFile().length() > 0L) {
-            this.playersCache = storage.readAll(new TypeToken<Map<String, PlayerData>>(){});
+            this.playersCache.putAll((storage.readAll(new TypeToken<Map<String, PlayerData>>() {})));
         }
     }
 
@@ -78,6 +78,11 @@ public class JsonStorage implements IStorage {
     }
 
     @Override
+    public boolean setMoney(String nickName, double amount) {
+        return false;
+    }
+
+    @Override
     public int getCoinsBalance(String nickName) {
         return 0;
     }
@@ -98,6 +103,11 @@ public class JsonStorage implements IStorage {
     }
 
     @Override
+    public boolean setCoins(String nickName, int amount) {
+        return false;
+    }
+
+    @Override
     public boolean createAccount(String nickName) {
         return false;
     }
@@ -108,12 +118,17 @@ public class JsonStorage implements IStorage {
     }
 
     @Override
-    public Collection<String> getMoneyTop(int amount) {
+    public void deleteAccount(String nickName) {
+
+    }
+
+    @Override
+    public List<String> getMoneyTop(int amount) {
         return null;
     }
 
     @Override
-    public Collection<String> getCoinsTop(int amount) {
+    public List<String> getCoinsTop(int amount) {
         return null;
     }
 

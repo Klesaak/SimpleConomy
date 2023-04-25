@@ -4,7 +4,9 @@ import com.google.common.base.Joiner;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import ua.klesaak.simpleconomy.utils.NumberUtils;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.Collection;
@@ -110,17 +112,17 @@ public class MessagesFile extends PluginConfig {
         sender.sendMessage(format);
     }
 
-    public void sendVaultPayReceived(CommandSender sender, String player, String money, String newBalance) {
+    public void sendVaultPayReceived(Player player, String senderName, String money, String newBalance) {
         String format = this.vaultPayReceived;
-        format = UtilityMethods.replaceAll(PLAYER_PATTERN, format, ()-> player);
+        format = UtilityMethods.replaceAll(PLAYER_PATTERN, format, ()-> senderName);
         format = UtilityMethods.replaceAll(MONEY_PATTERN, format, ()-> money);
         format = UtilityMethods.replaceAll(NEW_BALANCE_PATTERN, format, ()-> newBalance);
-        sender.sendMessage(format);
+        player.sendMessage(format);
     }
 
-    public void sendErrorMinTransaction(CommandSender sender, String minimumSum, String balance) {
+    public void sendErrorMinTransaction(CommandSender sender, String minimumSum, String money) {
         String format = this.errorMinTransaction;
-        format = UtilityMethods.replaceAll(BALANCE_PATTERN, format, ()-> balance);
+        format = UtilityMethods.replaceAll(MONEY_PATTERN, format, ()-> money);
         format = UtilityMethods.replaceAll(SUM_PATTERN, format, ()-> minimumSum);
         sender.sendMessage(format);
     }

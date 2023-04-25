@@ -1,9 +1,6 @@
 #Доступные хранилища: mysql, redis, file
 storage: mysql
 
-#Использовать ли redis pub-sub технологию для отправки пакета-обновления данных всем плагинам экономики.
-useRedisMessagingUpdater: false
-
 #Настройка file хранилища
 file:
   fileName: "storage"
@@ -25,8 +22,6 @@ redis:
   port: 6379
   password: ""
   database: 0
-  #Если @useRedisMessagingUpdater: true - то через данный канал будут отправляться пакет-реквесты для обновления данных на других серверах.
-  serverChannel: "simple-economy"
 
 #Максимально допустимый баланс игрока
 maxBalance: 500000
@@ -36,7 +31,7 @@ maxCoins: 100000
 startBalance: 100
 startCoins: 10
 
-#Минимальная сума денег на балансе игрока, при котором он может совершить перевод через /pay
+#Минимальная сума денег которую он может перевести через /pay
 minTransactionSum: 100
 
 #Настройки топа.

@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -15,8 +15,8 @@ public class TopManager {
 
     public TopManager(SimpleEconomyManager manager, int moneyTopCount, int coinsTopCount, int topUpdateInterval) {
         this.manager = manager;
-        this.moneyTop = new LinkedList<>();
-        this.coinsTop = new LinkedList<>();
+        this.moneyTop = new ArrayList<>(moneyTopCount);
+        this.coinsTop = new ArrayList<>(coinsTopCount);
         this.startUpdateTask(moneyTopCount, coinsTopCount, topUpdateInterval);
     }
 

@@ -44,7 +44,7 @@ public class PayCommand extends AbstractBukkitCommand {
         }
         val receiverBalance = storage.getPlayer(playerName.toLowerCase()).getMoney();
         if (!storage.hasMoney(playerSender.getName().toLowerCase(), sum)) {
-            messagesFile.sendVaultNoMoney(sender, config.formatMoney(receiverBalance));
+            messagesFile.sendVaultNoMoney(sender, config.formatMoney(storage.getPlayer(playerSender.getName().toLowerCase()).getMoney()));
             return;
         }
         if (config.getMinTransactionSum() > sum) {

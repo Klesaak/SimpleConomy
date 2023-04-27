@@ -1,6 +1,7 @@
 package ua.klesaak.simpleconomy.manager;
 
 import lombok.Getter;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.ServicePriority;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
 import ua.klesaak.simpleconomy.commands.AdminCommands;
 import ua.klesaak.simpleconomy.commands.BalTopCommand;
@@ -25,9 +27,7 @@ import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 import java.util.logging.Level;
 
 //todo нормальный reload
-//todo redis, json
-//todo papi
-
+//todo redis
 
 @Getter
 public class SimpleEconomyManager implements Listener {
@@ -36,6 +36,7 @@ public class SimpleEconomyManager implements Listener {
     private MessagesFile messagesFile;
     private volatile IStorage storage;
     private TopManager topManager;
+    private PAPIExpansion papiExpansion;
 
     public SimpleEconomyManager(SimpleConomyPlugin plugin) {
         this.plugin = plugin;
@@ -44,10 +45,9 @@ public class SimpleEconomyManager implements Listener {
             Bukkit.getPluginManager().disablePlugin(this.plugin);
             return;
         }
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new PAPIExpansion(this);
         this.configFile = new ConfigFile(this.plugin);
         this.messagesFile = new MessagesFile(this.plugin);
-        new VaultEconomyHook(this);
+        Bukkit.getServicesManager().register(Economy.class, new VaultEconomyHook(this), this.plugin, ServicePriority.Highest);;
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
         this.initStorage();
         //================COMMANDS================\\
@@ -57,6 +57,10 @@ public class SimpleEconomyManager implements Listener {
         new PayCommand(this);
         //================COMMANDS================\\
         this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            this.papiExpansion = new PAPIExpansion(this);
+            this.papiExpansion.register();
+        }
     }
 
     private void initStorage() {
@@ -81,6 +85,10 @@ public class SimpleEconomyManager implements Listener {
         this.getPlugin().getLogger().info("Storage type loaded: " + storageType);
     }
 
+    public void onPluginEnable() {
+
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         this.storage.cachePlayer(event.getPlayer().getName());
@@ -99,5 +107,8 @@ public class SimpleEconomyManager implements Listener {
 
     public void disable() {
         this.storage.close();
+        if (this.plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && this.papiExpansion.isRegistered()) {
+            this.papiExpansion.unregister();
+        }
     }
 }

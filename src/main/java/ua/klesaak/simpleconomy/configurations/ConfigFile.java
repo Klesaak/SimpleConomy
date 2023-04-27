@@ -52,10 +52,6 @@ public class ConfigFile extends PluginConfig {
         return format;
     }
 
-    public ConfigurationSection getFileSection() {
-        return this.getConfigurationSection("file");
-    }
-
     public ConfigurationSection getMySQLSection() {
         return this.getConfigurationSection("mysql");
     }

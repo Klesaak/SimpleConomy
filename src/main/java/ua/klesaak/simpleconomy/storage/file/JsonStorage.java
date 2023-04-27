@@ -2,6 +2,7 @@ package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
 import lombok.Synchronized;
+import lombok.val;
 import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JsonStorage implements IStorage {
     private final SimpleEconomyManager manager;
     Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
-    private JsonData storage;
+    private final JsonData storage;
 
     public JsonStorage(SimpleEconomyManager manager) {
         this.manager = manager;
@@ -33,9 +34,14 @@ public class JsonStorage implements IStorage {
 
     }
 
-    @Override @Synchronized
-    public void savePlayer(String nickName, PlayerData playerData) {
+    @Synchronized
+    private void save() {
         CompletableFuture.runAsync(() -> this.storage.write(this.playersCache, true));
+    }
+
+    @Override
+    public void savePlayer(String nickName, PlayerData playerData) {
+        this.save();
     }
 
     @Override
@@ -67,59 +73,114 @@ public class JsonStorage implements IStorage {
 
     @Override
     public boolean withdrawMoney(String nickName, double amount) {
-
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).withdrawMoney(amount);
+            this.save();
+            return true;
+        }
+        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        playerData.withdrawMoney(amount);
+        this.playersCache.put(nickName, playerData);
+        this.save();
         return true;
     }
 
     @Override
     public boolean depositMoney(String nickName, double amount) {
-
-        return false;
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).depositMoney(amount);
+            this.save();
+            return true;
+        }
+        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        playerData.depositMoney(amount);
+        this.playersCache.put(nickName, playerData);
+        this.save();
+        return true;
     }
 
     @Override
     public boolean setMoney(String nickName, double amount) {
-        return false;
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).setMoney(amount);
+            this.save();
+            return true;
+        }
+        this.playersCache.put(nickName, new PlayerData(nickName, amount, manager.getConfigFile().getStartCoins()));
+        this.save();
+        return true;
     }
 
     @Override
     public int getCoinsBalance(String nickName) {
-        return 0;
+        if (this.hasAccount(nickName)) return this.playersCache.get(nickName).getCoins();
+        return manager.getConfigFile().getStartCoins();
     }
 
     @Override
     public boolean hasCoins(String nickName, int amount) {
-        return false;
+        if (this.hasAccount(nickName)) return this.playersCache.get(nickName).getCoins() >= amount;
+        return manager.getConfigFile().getStartCoins() >= amount;
     }
 
     @Override
     public boolean withdrawCoins(String nickName, int amount) {
-        return false;
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).withdrawCoins(amount);
+            this.save();
+            return true;
+        }
+        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        playerData.withdrawCoins(amount);
+        this.playersCache.put(nickName, playerData);
+        this.save();
+        return true;
     }
 
     @Override
     public boolean depositCoins(String nickName, int amount) {
-        return false;
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).depositCoins(amount);
+            this.save();
+            return true;
+        }
+        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        playerData.depositCoins(amount);
+        this.playersCache.put(nickName, playerData);
+        this.save();
+        return true;
     }
 
     @Override
     public boolean setCoins(String nickName, int amount) {
-        return false;
+        if (this.hasAccount(nickName)) {
+            this.playersCache.get(nickName).setCoins(amount);
+            this.save();
+            return true;
+        }
+        this.playersCache.put(nickName, new PlayerData(nickName, manager.getConfigFile().getStartBalance(), amount));
+        this.save();
+        return true;
     }
 
     @Override
     public boolean createAccount(String nickName) {
-        return false;
+        System.out.println("S-ECON-DEBUG: JsonStorage.class, createAccount method has been called.");
+        return true;
     }
 
     @Override
     public PlayerData getPlayer(String nickName) {
-        return null;
+        if (this.hasAccount(nickName)) {
+            return this.playersCache.get(nickName);
+        }
+        return new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
     }
 
     @Override
     public void deleteAccount(String nickName) {
-
+        this.playersCache.remove(nickName);
+        this.save();
     }
 
     @Override

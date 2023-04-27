@@ -21,7 +21,6 @@ import ua.klesaak.simpleconomy.storage.IStorage;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,10 +50,12 @@ public class MySQLStorage implements IStorage {
             DatabaseFieldConfig moneyField = new DatabaseFieldConfig(MySQLConfig.MONEY_COLUMN);
             moneyField.setCanBeNull(false);
             moneyField.setDataType(DataType.DOUBLE);
+            moneyField.setDefaultValue("0");
             fieldConfigs.add(moneyField);
             DatabaseFieldConfig coinsField = new DatabaseFieldConfig(MySQLConfig.COINS_COLUMN);
             coinsField.setDataType(DataType.INTEGER);
             coinsField.setCanBeNull(false);
+            coinsField.setDefaultValue("0");
             fieldConfigs.add(coinsField);
             DatabaseTableConfig<PlayerData> accountTableConfig = new DatabaseTableConfig<>(PlayerData.class, config.getTable(), fieldConfigs);
             this.connectionSource = new JdbcPooledConnectionSource(config.getHost());
@@ -180,16 +181,9 @@ public class MySQLStorage implements IStorage {
         return true;
     }
 
-    @Override @SneakyThrows(SQLException.class)
+    @Override
     public PlayerData getPlayer(String nickName) {
-        val temporalContainer = this.temporalCache.getIfPresent(nickName);
-        if (temporalContainer != null) return temporalContainer.getObject();
-        PlayerData playerData = this.playerDataDao.queryForId(nickName);
-        if (playerData == null) {
-            playerData = new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
-        }
-        this.temporalCache.put(nickName, new AsyncUpdateContainer<>(this.playerDataDao, this.scheduledExecutor, playerData));
-        return playerData;
+        return this.getPlayerContainer(nickName).getObject();
     }
 
     @Override @SneakyThrows

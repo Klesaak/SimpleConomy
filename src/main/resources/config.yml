@@ -1,11 +1,6 @@
 #Доступные хранилища: mysql, redis, file
 storage: mysql
 
-#Настройка file хранилища
-file:
-  fileName: "storage"
-  savePeriod: 20s
-
 #Настройка mysql хранилища
 mysql:
   host: localhost

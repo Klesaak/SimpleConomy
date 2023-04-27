@@ -44,10 +44,12 @@ public class PAPIExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        if (identifier.equals("user")) {
-            return player.getName();
+        if (identifier.equals("simpleconomy_coins")) {
+            return String.valueOf(this.manager.getStorage().getCoinsBalance(player.getName().toLowerCase()));
         }
-
+        if (identifier.equals("simpleconomy_money")) {
+            return String.valueOf(this.manager.getStorage().getMoneyBalance(player.getName().toLowerCase()));
+        }
         return "";
     }
 }

@@ -54,7 +54,7 @@ public class SimpleEconomyManager implements Listener {
         new AdminCommands(this);
         new BalanceCommand(this);
         new BalTopCommand(this);
-        new PayCommand(this);
+        if (this.configFile.isPayCommandEnabled()) new PayCommand(this);
         //================COMMANDS================\\
         this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -107,7 +107,7 @@ public class SimpleEconomyManager implements Listener {
 
     public void disable() {
         this.storage.close();
-        if (this.plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && this.papiExpansion.isRegistered()) {
+        if (this.plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") && this.papiExpansion.isRegistered()) {
             this.papiExpansion.unregister();
         }
     }

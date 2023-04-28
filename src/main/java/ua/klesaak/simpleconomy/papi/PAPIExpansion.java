@@ -1,6 +1,7 @@
 package ua.klesaak.simpleconomy.papi;
 
 import lombok.NonNull;
+import lombok.val;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,11 +45,13 @@ public class PAPIExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        if (identifier.equals("simpleconomy_coins")) {
-            return String.valueOf(this.manager.getStorage().getCoinsBalance(player.getName().toLowerCase()));
+        val storage = this.manager.getStorage();
+        val playerName = player.getName().toLowerCase();
+        if (identifier.equalsIgnoreCase("simpleconomy_coins")) {
+            return String.valueOf(storage.getCoinsBalance(playerName));
         }
-        if (identifier.equals("simpleconomy_money")) {
-            return String.valueOf(this.manager.getStorage().getMoneyBalance(player.getName().toLowerCase()));
+        if (identifier.equalsIgnoreCase("simpleconomy_money")) {
+            return String.valueOf(storage.getMoneyBalance(playerName));
         }
         return "";
     }

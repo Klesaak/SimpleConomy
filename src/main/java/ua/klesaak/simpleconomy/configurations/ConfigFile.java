@@ -21,12 +21,14 @@ public class ConfigFile extends PluginConfig {
     int maxBalance, maxCoins, startBalance, startCoins, minTransactionSum;
     int playerTopMoneyCount, playerTopCoinsCount, playerTopUpdateTickInterval;
     String topFormat;
+    boolean payCommandEnabled;
     String currencyFormatPlural, currencyFormatSingular, currencyFormatPlural2, currencyCoinsFormatPlural, currencyCoinsFormatSingular, currencyCoinsFormatPlural2;
 
 
     public ConfigFile(JavaPlugin plugin) {
         super(plugin, "config.yml");
         this.storage = this.getString("storage");
+        this.payCommandEnabled = this.getBoolean("payCommandEnabled");
         this.maxBalance = this.getInt("maxBalance");
         this.maxCoins = this.getInt("maxCoins");
         this.startBalance = this.getInt("startBalance");

@@ -1,6 +1,9 @@
 #Доступные хранилища: mysql, redis, file
 storage: mysql
 
+#Будет ли функционировать команда /pay (актуально для серверов мини-игр)
+payCommandEnabled: true
+
 #Настройка mysql хранилища
 mysql:
   host: localhost

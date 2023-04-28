@@ -3,21 +3,19 @@ package ua.klesaak.simpleconomy.storage.file;
 import com.google.gson.reflect.TypeToken;
 import lombok.Synchronized;
 import lombok.val;
-import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.IStorage;
 import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JsonStorage implements IStorage {
     private final SimpleEconomyManager manager;
-    Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
+    Map<String, PlayerData> playersCache = new ConcurrentHashMap<>();
     private final JsonData storage;
 
     public JsonStorage(SimpleEconomyManager manager) {
@@ -185,16 +183,29 @@ public class JsonStorage implements IStorage {
 
     @Override
     public List<String> getMoneyTop(int amount) {
-        return null;
+        List<String> list = new ArrayList<>(128);
+        List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
+        dataList.sort(Comparator.comparingDouble(PlayerData::getMoney).reversed());
+        for (val data : dataList) {
+            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getMoney())));
+        }
+        return list;
     }
 
     @Override
     public List<String> getCoinsTop(int amount) {
-        return null;
+        List<String> list = new ArrayList<>(128);
+        List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
+        dataList.sort(Comparator.comparingDouble(PlayerData::getCoins).reversed());
+        for (val data : dataList) {
+            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getCoins())));
+        }
+        Collections.reverse(list);
+        return list;
     }
 
     @Override
     public void close() {
-
+        //empty
     }
 }

@@ -2,11 +2,9 @@ package ua.klesaak.simpleconomy.storage;
 
 import ua.klesaak.simpleconomy.manager.PlayerData;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IStorage {
-    void init();
     void savePlayer(String nickName, PlayerData playerData);
     void cachePlayer(String nickName);
     void unCachePlayer(String nickName);

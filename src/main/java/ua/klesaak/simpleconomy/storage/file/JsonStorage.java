@@ -1,7 +1,9 @@
 package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
+import lombok.AccessLevel;
 import lombok.Synchronized;
+import lombok.experimental.FieldDefaults;
 import lombok.val;
 import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
@@ -13,10 +15,11 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JsonStorage implements IStorage {
-    private final SimpleEconomyManager manager;
+    SimpleEconomyManager manager;
     Map<String, PlayerData> playersCache = new ConcurrentHashMap<>();
-    private final JsonData storage;
+    JsonData storage;
 
     public JsonStorage(SimpleEconomyManager manager) {
         this.manager = manager;
@@ -24,12 +27,6 @@ public class JsonStorage implements IStorage {
         if (storage.getFile().length() > 0L) {
             this.playersCache.putAll((storage.readAll(new TypeToken<Map<String, PlayerData>>() {})));
         }
-    }
-
-
-    @Override
-    public void init() {
-
     }
 
     @Synchronized

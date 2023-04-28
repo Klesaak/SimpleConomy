@@ -81,9 +81,6 @@ public class MySQLStorage implements IStorage {
     }
 
     @Override
-    public void init() {}
-
-    @Override
     public void savePlayer(String nickName, PlayerData playerData) {
         AsyncUpdateContainer<PlayerData> container = this.temporalCache.getIfPresent(nickName);
         if (container != null) container.scheduleUpdate();

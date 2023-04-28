@@ -18,12 +18,6 @@ public class RedisStorage implements IStorage {
         this.manager = manager;
     }
 
-
-    @Override
-    public void init() {
-
-    }
-
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
 

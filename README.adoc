@@ -1,0 +1,27 @@
+= Simple Conomy
+
+Bukkit economy plugin.
+
+* Minecraft `1.12.x-1.19.x`
+
+Data storage: file(json), mysql, redis.
+
+Includes 2 currencies.
+
+*Commands:*
+
+* /sconomy - command for server admins
+** aliases: scon, seco
+** permission: "simpleconomy.admin"
+* /pay - command for transfer money to another player
+** aliases: epay, wpay
+* /balance - displayes own/other player balance:
+** aliases: money, emoney, ebalance, bal, eco, coins
+** permissions: simpleconomy.others (give possibility to see other player balance)
+* /baltop - displays top players balance
+** aliases: ebaltop
+
+*Dependencies:*
+
+* Vault
+* PlaceholderAPI

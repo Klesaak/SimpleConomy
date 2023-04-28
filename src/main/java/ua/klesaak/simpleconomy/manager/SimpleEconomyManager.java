@@ -85,10 +85,6 @@ public class SimpleEconomyManager implements Listener {
         this.getPlugin().getLogger().info("Storage type loaded: " + storageType);
     }
 
-    public void onPluginEnable() {
-
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         this.storage.cachePlayer(event.getPlayer().getName());

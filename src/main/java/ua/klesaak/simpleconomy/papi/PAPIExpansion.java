@@ -30,7 +30,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 
     @NonNull @Override
     public String getIdentifier() {
-        return "SimpleEconomy";
+        return "simpleconomy";
     }
 
     @NonNull @Override
@@ -47,10 +47,10 @@ public class PAPIExpansion extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, String identifier) {
         val storage = this.manager.getStorage();
         val playerName = player.getName().toLowerCase();
-        if (identifier.equalsIgnoreCase("simpleconomy_coins")) {
+        if (identifier.equalsIgnoreCase("coins")) {
             return String.valueOf(storage.getCoinsBalance(playerName));
         }
-        if (identifier.equalsIgnoreCase("simpleconomy_money")) {
+        if (identifier.equalsIgnoreCase("money")) {
             return String.valueOf(storage.getMoneyBalance(playerName));
         }
         return "";

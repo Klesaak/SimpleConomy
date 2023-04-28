@@ -17,7 +17,7 @@ public class BalanceCommand extends AbstractBukkitCommand {
     }
 
     @Override
-    public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
+    public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
         val configFile = manager.getConfigFile();
         val messagesFile = manager.getMessagesFile();

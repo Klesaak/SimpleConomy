@@ -14,14 +14,14 @@ public abstract class AbstractBukkitCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NonNull CommandSender commandSender, @NonNull Command command, @NonNull String label, String[] args) {
         try {
-            this.onReceiveCommand(commandSender, command, args);
+            this.onReceiveCommand(commandSender, label, args);
         } catch (RuntimeException exception) {
             commandSender.sendMessage(exception.getMessage());
         }
         return false;
     }
 
-    public abstract void onReceiveCommand(CommandSender sender, Command command, String[] args);
+    public abstract void onReceiveCommand(CommandSender sender, String label, String[] args);
 
     public void cmdVerifyArgs(int minimum, String[] args, String usage) {
         if (args.length < minimum) {

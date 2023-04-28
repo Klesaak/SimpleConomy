@@ -2,7 +2,6 @@ package ua.klesaak.simpleconomy.commands;
 
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
@@ -17,11 +16,11 @@ public class PayCommand extends AbstractBukkitCommand {
     }
 
     @Override
-    public void onReceiveCommand(CommandSender sender, Command command, String[] args) {
+    public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
         val messagesFile = this.manager.getMessagesFile();
         if (args.length != 2) {
-            messagesFile.sendVaultPayUsage(sender, command.getLabel());
+            messagesFile.sendVaultPayUsage(sender, label);
             return;
         }
         val config = this.manager.getConfigFile();

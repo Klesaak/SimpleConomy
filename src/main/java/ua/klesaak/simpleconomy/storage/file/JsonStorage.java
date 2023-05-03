@@ -203,6 +203,6 @@ public class JsonStorage implements IStorage {
 
     @Override
     public void close() {
-        //empty
+        this.save();
     }
 }

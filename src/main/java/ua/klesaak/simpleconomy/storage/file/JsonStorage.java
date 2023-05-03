@@ -25,13 +25,14 @@ public class JsonStorage implements IStorage {
         this.manager = manager;
         this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
         if (storage.getFile().length() > 0L) {
-            this.playersCache.putAll((storage.readAll(new TypeToken<Map<String, PlayerData>>() {})));
+            Collection<PlayerData> dataCollection = storage.readAll(new TypeToken<Collection<PlayerData>>() {});
+            dataCollection.forEach(playerData -> this.playersCache.put(playerData.getPlayerName(), playerData));
         }
     }
 
     @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache, true));
+        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), true));
     }
 
     @Override

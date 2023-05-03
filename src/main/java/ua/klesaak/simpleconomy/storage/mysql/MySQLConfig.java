@@ -3,6 +3,7 @@ package ua.klesaak.simpleconomy.storage.mysql;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.bukkit.configuration.ConfigurationSection;
 
 @Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -25,20 +26,29 @@ public class MySQLConfig {
     }
 
     public String getHost() {
-        return "jdbc:mysql://" + this.username + ":" + this.password + "@" + this.address + "/" + this.database +
-                "?useUnicode=true&" +
-                "characterEncoding=utf-8&" +
-                "prepStmtCacheSize=250&" +
-                "prepStmtCacheSqlLimit=2048&" +
-                "cachePrepStmts=true&" +
-                "useServerPrepStmts=true&" +
-                "cacheServerConfiguration=true&" +
-                "useLocalSessionState=true&" +
-                "rewriteBatchedStatements=true&" +
-                "maintainTimeStats=false&" +
-                "useUnbufferedInput=false&" +
-                "useReadAheadInput=false&" +
-                "useSSL=" + this.isUseSSL +
-                "&autoReconnect=true";
+        val builder = new StringBuilder("jdbc:mysql://");
+        builder.append(this.username);
+        builder.append(":");
+        builder.append(this.password);
+        builder.append("@");
+        builder.append(this.address);
+        builder.append("/");
+        builder.append(this.database);
+        builder.append("?useUnicode=true&");
+        builder.append("characterEncoding=utf-8&");
+        builder.append("prepStmtCacheSize=250&");
+        builder.append("prepStmtCacheSqlLimit=2048&");
+        builder.append("cachePrepStmts=true&");
+        builder.append("useServerPrepStmts=true&");
+        builder.append("cacheServerConfiguration=true&");
+        builder.append("useLocalSessionState=true&");
+        builder.append("rewriteBatchedStatements=true&");
+        builder.append("maintainTimeStats=false&");
+        builder.append("useUnbufferedInput=false&");
+        builder.append("useReadAheadInput=false&");
+        builder.append("useSSL=");
+        builder.append(this.isUseSSL);
+        builder.append("&autoReconnect=true");
+        return builder.toString();
     }
 }

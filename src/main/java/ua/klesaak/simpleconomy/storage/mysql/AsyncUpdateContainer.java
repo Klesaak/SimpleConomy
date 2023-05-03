@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.storage.mysql;
 
 import com.j256.ormlite.dao.Dao;
-import lombok.Synchronized;
 
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;

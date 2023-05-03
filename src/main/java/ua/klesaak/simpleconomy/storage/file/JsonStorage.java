@@ -20,7 +20,6 @@ public class JsonStorage implements IStorage {
     SimpleEconomyManager manager;
     Map<String, PlayerData> playersCache = new ConcurrentHashMap<>();
     JsonData storage;
-
     public JsonStorage(SimpleEconomyManager manager) {
         this.manager = manager;
         this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));

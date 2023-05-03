@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.logging.Level;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,7 +33,7 @@ public class PluginConfig extends YamlConfiguration {
             Files.createDirectory(pluginDataFolderPath);
             plugin.getLogger().log(Level.WARNING, "successfully create file: " + pluginDataFolderPath);
         }
-        if (!this.file.exists()) Files.copy(plugin.getResource(file.getName()), file.toPath());
+        if (!this.file.exists()) Files.copy(Objects.requireNonNull(plugin.getResource(file.getName())), file.toPath());
         this.load(this.file);
     }
 

@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.ServicePriority;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
+import ua.klesaak.simpleconomy.api.SimpleEconomyAPI;
 import ua.klesaak.simpleconomy.commands.AdminCommands;
 import ua.klesaak.simpleconomy.commands.BalTopCommand;
 import ua.klesaak.simpleconomy.commands.BalanceCommand;
@@ -61,6 +62,7 @@ public class SimpleEconomyManager implements Listener {
             this.papiExpansion = new PAPIExpansion(this);
             this.papiExpansion.register();
         }
+        SimpleEconomyAPI.register(this);
     }
 
     private void initStorage() {

@@ -36,7 +36,7 @@ public class ConfigFile extends PluginConfig {
         this.minTransactionSum = this.getInt("minTransactionSum");
         this.playerTopMoneyCount = this.getInt("playerTop.moneyCount");
         this.playerTopCoinsCount = this.getInt("playerTop.coinsCount");
-        this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) / 20);
+        this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) * 20);
         this.topFormat = UtilityMethods.color(this.getString("playerTop.topFormat"));
         this.currencyFormatPlural = this.getString("currencyFormat.plural");
         this.currencyFormatSingular = this.getString("currencyFormat.singular");

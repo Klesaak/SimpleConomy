@@ -42,7 +42,7 @@ public class AsyncUpdateContainer<T> {
             try {
                 dao.createOrUpdate(object);
             } catch (SQLException e) {
-                System.out.println("Unable to save sql data: " + e);
+                throw new RuntimeException("Unable to save sql data: " + e);
             }
         };
         CompletableFuture.runAsync(run)

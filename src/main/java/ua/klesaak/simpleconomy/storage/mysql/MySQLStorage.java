@@ -10,9 +10,7 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTableConfig;
 import com.j256.ormlite.table.TableUtils;
-import lombok.AccessLevel;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.PlayerData;
@@ -22,20 +20,17 @@ import ua.klesaak.simpleconomy.storage.IStorage;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MySQLStorage implements IStorage {
-    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(3);
-    Cache<String, AsyncUpdateContainer<PlayerData>> temporalCache = CacheBuilder.newBuilder()
+    private final Cache<String, AsyncUpdateContainer<PlayerData>> temporalCache = CacheBuilder.newBuilder()
             .initialCapacity(Bukkit.getMaxPlayers())
             .concurrencyLevel(16)
             .expireAfterWrite(1, TimeUnit.MINUTES).build(); //Временный кеш, чтобы уменьшить кол-во запросов в бд.
-    JdbcPooledConnectionSource connectionSource;
-    Dao<PlayerData, String> playerDataDao;
-    SimpleEconomyManager manager;
+    private final JdbcPooledConnectionSource connectionSource;
+    private final Dao<PlayerData, String> playerDataDao;
+    private final SimpleEconomyManager manager;
 
     public MySQLStorage(SimpleEconomyManager manager) {
         this.manager = manager;
@@ -71,11 +66,12 @@ public class MySQLStorage implements IStorage {
     private AsyncUpdateContainer<PlayerData> getPlayerContainer(String nickName) {
         val temporalContainer = this.temporalCache.getIfPresent(nickName);
         if (temporalContainer != null) return temporalContainer;
-        PlayerData playerData = this.playerDataDao.queryForId(nickName);
+        PlayerData playerData = this.loadPlayer(nickName);
+        val configFile = manager.getConfigFile();
         if (playerData == null) {
-            playerData = new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+            playerData = new PlayerData(nickName, configFile.getStartBalance(), configFile.getStartCoins());
         }
-        AsyncUpdateContainer<PlayerData> container = new AsyncUpdateContainer<>(this.playerDataDao, this.scheduledExecutor, playerData);
+        AsyncUpdateContainer<PlayerData> container = new AsyncUpdateContainer<>(this.playerDataDao, playerData);
         this.temporalCache.put(nickName, container);
         return container;
     }
@@ -96,12 +92,25 @@ public class MySQLStorage implements IStorage {
         this.temporalCache.invalidate(nickName);
     }
 
-    @Override @SneakyThrows(SQLException.class)
+    @Override
     public boolean hasAccount(String nickName) {
         val temporalContainer = this.temporalCache.getIfPresent(nickName);
         if (temporalContainer != null) return true;
-        PlayerData playerData = this.playerDataDao.queryForId(nickName);
+        PlayerData playerData = this.loadPlayer(nickName);
         return playerData != null;
+    }
+
+    private PlayerData loadPlayer(String nickName) {
+        return CompletableFuture.supplyAsync(()-> {
+            try {
+                return this.playerDataDao.queryForId(nickName);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error while load player " + nickName, e);
+            }
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        }).join();
     }
 
     @Override
@@ -183,16 +192,18 @@ public class MySQLStorage implements IStorage {
         return this.getPlayerContainer(nickName).getObject();
     }
 
-    @Override @SneakyThrows
+    @Override
     public void deleteAccount(String nickName) {
-        Runnable run = () -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 this.playerDataDao.deleteById(nickName);
             } catch (SQLException ex) {
                 throw new RuntimeException("Произошла ошибка при удалении данных из MySQL", ex);
             }
-        };
-        this.scheduledExecutor.execute(run);
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
     }
 
     @Override @SneakyThrows(SQLException.class)
@@ -219,10 +230,8 @@ public class MySQLStorage implements IStorage {
         return list;
     }
 
-    @Override @SneakyThrows
+    @Override
     public void close() {
-        scheduledExecutor.shutdown();
-        scheduledExecutor.awaitTermination(10, TimeUnit.MINUTES);
         this.connectionSource.closeQuietly();
     }
 }

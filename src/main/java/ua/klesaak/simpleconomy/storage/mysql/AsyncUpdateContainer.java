@@ -3,7 +3,7 @@ package ua.klesaak.simpleconomy.storage.mysql;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author _Shevchik_
@@ -11,7 +11,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class AsyncUpdateContainer<T> {
     private final Dao<T, ?> dao;
-    private final ScheduledExecutorService executor;
     private final Object updateLock = new Object();
     private volatile boolean updateScheduled = false;
     private final T object;
@@ -20,9 +19,8 @@ public class AsyncUpdateContainer<T> {
     /**
      * @param object объект-класс, с которым будем оперировать, например: "PlayerData::new"
      */
-    public AsyncUpdateContainer(Dao<T, ?> dao, ScheduledExecutorService executor, T object) {
+    public AsyncUpdateContainer(Dao<T, ?> dao, T object) {
         this.dao = dao;
-        this.executor = executor;
         this.object = object;
     }
 
@@ -47,6 +45,10 @@ public class AsyncUpdateContainer<T> {
                 System.out.println("Unable to save sql data: " + e);
             }
         };
-        executor.execute(run);
+        CompletableFuture.runAsync(run)
+                .exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                });
     }
 }

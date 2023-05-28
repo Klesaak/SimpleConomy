@@ -1,8 +1,6 @@
 package ua.klesaak.simpleconomy.configurations;
 
-import lombok.AccessLevel;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,9 +10,8 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.logging.Level;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PluginConfig extends YamlConfiguration {
-    transient File file;
+    private final transient File file;
 
     public PluginConfig(JavaPlugin plugin, File directory, String configFileName) {
         this.file = new File(directory, configFileName);

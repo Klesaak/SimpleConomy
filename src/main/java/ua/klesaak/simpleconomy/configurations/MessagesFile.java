@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import ua.klesaak.simpleconomy.utils.NumberUtils;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.Collection;

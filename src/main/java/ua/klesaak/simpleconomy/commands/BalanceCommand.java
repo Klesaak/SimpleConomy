@@ -8,12 +8,14 @@ import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
+import java.util.Objects;
+
 public class BalanceCommand extends AbstractBukkitCommand {
     private final SimpleEconomyManager manager;
 
     public BalanceCommand(SimpleEconomyManager manager) {
         this.manager = manager;
-        this.manager.getPlugin().getCommand("balance").setExecutor(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("balance")).setExecutor(this);
     }
 
     @Override

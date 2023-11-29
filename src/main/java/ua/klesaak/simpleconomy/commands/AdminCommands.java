@@ -10,10 +10,7 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class AdminCommands extends AbstractBukkitCommand implements TabCompleter {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "delacc");
@@ -21,8 +18,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
 
     public AdminCommands(SimpleEconomyManager manager) {
         this.manager = manager;
-        this.manager.getPlugin().getCommand("sconomy").setExecutor(this);
-        this.manager.getPlugin().getCommand("sconomy").setTabCompleter(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("sconomy")).setExecutor(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("sconomy")).setTabCompleter(this);
     }
 
 

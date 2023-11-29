@@ -7,12 +7,14 @@ import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
+import java.util.Objects;
+
 public class PayCommand extends AbstractBukkitCommand {
     private final SimpleEconomyManager manager;
 
     public PayCommand(SimpleEconomyManager manager) {
         this.manager = manager;
-        this.manager.getPlugin().getCommand("pay").setExecutor(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("pay")).setExecutor(this);
     }
 
     @Override

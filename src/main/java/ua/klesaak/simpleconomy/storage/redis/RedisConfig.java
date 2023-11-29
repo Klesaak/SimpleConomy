@@ -1,8 +1,6 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.bukkit.configuration.ConfigurationSection;
 import redis.clients.jedis.Jedis;
@@ -10,10 +8,10 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
-@Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
 public class RedisConfig {
-    String address, password;
-    int port, database;
+    private final String address, password;
+    private final int port, database;
 
     public RedisConfig(ConfigurationSection configurationSection) {
         this.address = configurationSection.getString("host");

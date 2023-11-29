@@ -1,27 +1,23 @@
 package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.Synchronized;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
-import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.storage.IStorage;
+import ua.klesaak.simpleconomy.storage.AbstractStorage;
+import ua.klesaak.simpleconomy.storage.PlayerData;
 import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class JsonStorage implements IStorage {
-    SimpleEconomyManager manager;
-    Map<String, PlayerData> playersCache = new ConcurrentHashMap<>();
-    JsonData storage;
+public class JsonStorage extends AbstractStorage {
+    public static Type DATA_COLLECTION_TYPE = new TypeToken<Collection<PlayerData>>() {}.getType();
+    private final JsonData storage;
     public JsonStorage(SimpleEconomyManager manager) {
-        this.manager = manager;
+        super(manager);
         this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
         if (storage.getFile().length() > 0L) {
             storage.readAll(new TypeToken<Collection<PlayerData>>() {}).forEach(playerData -> this.playersCache.put(playerData.getPlayerName(), playerData));
@@ -30,7 +26,7 @@ public class JsonStorage implements IStorage {
 
     @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), true));
+        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), DATA_COLLECTION_TYPE));
     }
 
     @Override

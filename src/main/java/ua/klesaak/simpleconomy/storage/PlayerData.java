@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.manager;
+package ua.klesaak.simpleconomy.storage;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +16,7 @@ public class PlayerData {
     public PlayerData(String playerName) {
         this.playerName = playerName;
     }
+
 
     public void withdrawMoney(double amount) {
         this.money -= amount;

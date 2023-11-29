@@ -1,85 +1,91 @@
 package ua.klesaak.simpleconomy.storage.mysql;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseFieldConfig;
-import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.table.DatabaseTableConfig;
-import com.j256.ormlite.table.TableUtils;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.bukkit.Bukkit;
-import ua.klesaak.simpleconomy.manager.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.storage.IStorage;
+import ua.klesaak.simpleconomy.storage.AbstractStorage;
+import ua.klesaak.simpleconomy.storage.PlayerData;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class MySQLStorage implements IStorage {
-    private final Cache<String, AsyncUpdateContainer<PlayerData>> temporalCache = CacheBuilder.newBuilder()
-            .initialCapacity(Bukkit.getMaxPlayers())
-            .concurrencyLevel(16)
-            .expireAfterWrite(1, TimeUnit.MINUTES).build(); //Временный кеш, чтобы уменьшить кол-во запросов в бд.
-    private final JdbcPooledConnectionSource connectionSource;
-    private final Dao<PlayerData, String> playerDataDao;
-    private final SimpleEconomyManager manager;
+public class MySQLStorage extends AbstractStorage {
+    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {TABLE} (playerName VARCHAR(16) NOT NULL UNIQUE, money BIGINT DEFAULT 0 , coins BIGINT DEFAULT 0 ) ENGINE = InnoDB; ";
+    public static final String INSERT_PLAYER = "TODO"; //executeUpdate()
+    public static final String GET_PLAYER_DATA = "SELECT money, coins FROM {TABLE} WHERE playerName=?"; //executeQuery()
+    public static final String GET_MONEY_TOP = "SELECT playerName, money FROM {TABLE} ORDER BY money DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
+    public static final String GET_COINS_TOP = "SELECT playerName, coins FROM {TABLE} ORDER BY coins DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
+    public static final String DELETE_PLAYER = "DELETE FROM {TABLE} WHERE playerName=?"; //execute()
+    private final HikariDataSource hikariDataSource;
+    private final MySQLConfig mySQLConfig;
 
     public MySQLStorage(SimpleEconomyManager manager) {
-        this.manager = manager;
-        val config = new MySQLConfig(manager.getConfigFile().getMySQLSection());
-        try {
-            List<DatabaseFieldConfig> fieldConfigs = new ArrayList<>();
-            DatabaseFieldConfig playerName = new DatabaseFieldConfig("playerName");
-            playerName.setId(true);
-            playerName.setCanBeNull(false);
-            playerName.setColumnName(MySQLConfig.PLAYER_COLUMN);
-            fieldConfigs.add(playerName);
-            DatabaseFieldConfig moneyField = new DatabaseFieldConfig(MySQLConfig.MONEY_COLUMN);
-            moneyField.setCanBeNull(false);
-            moneyField.setDataType(DataType.DOUBLE);
-            moneyField.setDefaultValue("0");
-            fieldConfigs.add(moneyField);
-            DatabaseFieldConfig coinsField = new DatabaseFieldConfig(MySQLConfig.COINS_COLUMN);
-            coinsField.setDataType(DataType.INTEGER);
-            coinsField.setCanBeNull(false);
-            coinsField.setDefaultValue("0");
-            fieldConfigs.add(coinsField);
-            DatabaseTableConfig<PlayerData> accountTableConfig = new DatabaseTableConfig<>(PlayerData.class, config.getTable(), fieldConfigs);
-            this.connectionSource = new JdbcPooledConnectionSource(config.getHost());
-            this.playerDataDao = DaoManager.createDao(this.connectionSource, accountTableConfig);
-            TableUtils.createTableIfNotExists(this.connectionSource, accountTableConfig);
-        } catch (SQLException ex) {
-            throw new RuntimeException("Произошла ошибка при инициализации MySQL", ex);
+        super(manager);
+        val configFile = manager.getConfigFile();
+        this.mySQLConfig = new MySQLConfig(configFile.getSQLSection(), configFile.getStorageType());
+        this.hikariDataSource = new HikariDataSource();
+        this.hikariDataSource.setJdbcUrl(this.mySQLConfig.getHost());
+        this.hikariDataSource.setMaximumPoolSize(3);
+        this.hikariDataSource.setPoolName("SimpleConomy-pool");
+        this.hikariDataSource.setMaxLifetime(TimeUnit.MINUTES.toMillis(30L));
+        this.hikariDataSource.setUsername(this.mySQLConfig.getUsername());
+        this.hikariDataSource.setPassword(this.mySQLConfig.getPassword());
+
+        try (PreparedStatement statement = this.prepareStatement(CREATE_TABLE)) {
+            statement.execute();
+        } catch (SQLException e) {
+            manager.getPlugin().getLogger().severe("Ошибка при создании таблицы MySQL " + e);
         }
-        this.connectionSource.setTestBeforeGet(true);
     }
 
-    @SneakyThrows(SQLException.class)
-    private AsyncUpdateContainer<PlayerData> getPlayerContainer(String nickName) {
-        val temporalContainer = this.temporalCache.getIfPresent(nickName);
-        if (temporalContainer != null) return temporalContainer;
-        PlayerData playerData = this.loadPlayer(nickName);
-        val configFile = manager.getConfigFile();
-        if (playerData == null) {
-            playerData = new PlayerData(nickName, configFile.getStartBalance(), configFile.getStartCoins());
-        }
-        AsyncUpdateContainer<PlayerData> container = new AsyncUpdateContainer<>(this.playerDataDao, playerData);
-        this.temporalCache.put(nickName, container);
-        return container;
+    private PreparedStatement prepareStatement(String sql) throws SQLException {
+        return this.hikariDataSource.getConnection().prepareStatement(sql.replace("{TABLE}", this.mySQLConfig.getTable()));
+    }
+
+    private PlayerData loadPlayer(String nickName) {
+        return CompletableFuture.supplyAsync(()-> {
+            PlayerData  playerData = null;
+            try (PreparedStatement statement = this.prepareStatement(GET_PLAYER_DATA)) {
+                statement.setString(1, nickName);
+                try (ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
+                        val money = rs.getDouble("money");
+                        val coins = rs.getInt("coins");
+                        playerData = new PlayerData(nickName, money, coins);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Произошла ошибка при загрузке данных из MySQL " + nickName, e);
+            }
+            return playerData;
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        }).join();
     }
 
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
-        AsyncUpdateContainer<PlayerData> container = this.temporalCache.getIfPresent(nickName);
-        if (container != null) container.scheduleUpdate();
+        CompletableFuture.runAsync(() -> {
+            try (PreparedStatement statement = this.prepareStatement(INSERT_PLAYER)) {
+
+                //TODO
+
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Произошла ошибка при сохранении данных в MySQL " + nickName, e);
+            }
+
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
     }
 
     @Override
@@ -89,28 +95,15 @@ public class MySQLStorage implements IStorage {
 
     @Override
     public void unCachePlayer(String nickName) {
-        this.temporalCache.invalidate(nickName);
+        this.playersCache.remove(nickName);
     }
 
     @Override
     public boolean hasAccount(String nickName) {
-        val temporalContainer = this.temporalCache.getIfPresent(nickName);
+        val temporalContainer = this.playersCache.get(nickName);
         if (temporalContainer != null) return true;
         PlayerData playerData = this.loadPlayer(nickName);
         return playerData != null;
-    }
-
-    private PlayerData loadPlayer(String nickName) {
-        return CompletableFuture.supplyAsync(()-> {
-            try {
-                return this.playerDataDao.queryForId(nickName);
-            } catch (SQLException e) {
-                throw new RuntimeException("Error while load player " + nickName, e);
-            }
-        }).exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
-        }).join();
     }
 
     @Override
@@ -125,25 +118,25 @@ public class MySQLStorage implements IStorage {
 
     @Override
     public boolean withdrawMoney(String nickName, double amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().withdrawMoney(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.withdrawMoney(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
     @Override
     public boolean depositMoney(String nickName, double amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().depositMoney(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.depositMoney(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
     @Override
     public boolean setMoney(String nickName, double amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().setMoney(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.setMoney(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
@@ -159,25 +152,25 @@ public class MySQLStorage implements IStorage {
 
     @Override
     public boolean withdrawCoins(String nickName, int amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().withdrawCoins(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.withdrawCoins(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
     @Override
     public boolean depositCoins(String nickName, int amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().depositCoins(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.depositCoins(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
     @Override
     public boolean setCoins(String nickName, int amount) {
-        val container = this.getPlayerContainer(nickName);
-        container.getObject().setCoins(amount);
-        container.scheduleUpdate();
+        val container = this.getPlayer(nickName);
+        container.setCoins(amount);
+        this.savePlayer(nickName, container);
         return true;
     }
 
@@ -189,14 +182,23 @@ public class MySQLStorage implements IStorage {
 
     @Override
     public PlayerData getPlayer(String nickName) {
-        return this.getPlayerContainer(nickName).getObject();
+        val container = this.playersCache.get(nickName);
+        if (container != null) return container;
+        PlayerData playerData = this.loadPlayer(nickName);
+        val configFile = manager.getConfigFile();
+        if (playerData == null) {
+            playerData = new PlayerData(nickName, configFile.getStartBalance(), configFile.getStartCoins());
+        }
+        this.playersCache.put(nickName, playerData);
+        return playerData;
     }
 
     @Override
     public void deleteAccount(String nickName) {
         CompletableFuture.runAsync(() -> {
-            try {
-                this.playerDataDao.deleteById(nickName);
+            try (PreparedStatement preparedStatement = this.prepareStatement(DELETE_PLAYER)) {
+                preparedStatement.setString(1, nickName);
+                preparedStatement.execute();
             } catch (SQLException ex) {
                 throw new RuntimeException("Произошла ошибка при удалении данных из MySQL", ex);
             }
@@ -206,32 +208,38 @@ public class MySQLStorage implements IStorage {
         });
     }
 
-    @Override @SneakyThrows(SQLException.class)
+    @Override @SneakyThrows()
     public List<String> getMoneyTop(int amount) {
         List<String> list = new ArrayList<>(128);
-        QueryBuilder<PlayerData, String> queryBuilder = this.playerDataDao.queryBuilder();
-        queryBuilder.selectColumns(MySQLConfig.PLAYER_COLUMN, MySQLConfig.MONEY_COLUMN).orderBy(MySQLConfig.MONEY_COLUMN, false).limit((long)amount);
-        List<PlayerData> rs = queryBuilder.query();
-        for (val data : rs) {
-            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getMoney())));
+        try (PreparedStatement statement = this.prepareStatement(GET_MONEY_TOP.replace("{COUNT_IN_TOP}", String.valueOf(amount)))) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), rs.getString("playerName"), String.valueOf(rs.getDouble("money"))));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Произошла ошибка при загрузке топа из MySQL ", e);
         }
         return list;
     }
 
-    @Override @SneakyThrows(SQLException.class)
+    @Override @SneakyThrows()
     public List<String> getCoinsTop(int amount) {
         List<String> list = new ArrayList<>(128);
-        QueryBuilder<PlayerData, String> queryBuilder = this.playerDataDao.queryBuilder();
-        queryBuilder.selectColumns(MySQLConfig.PLAYER_COLUMN, MySQLConfig.COINS_COLUMN).orderBy(MySQLConfig.COINS_COLUMN, false).limit((long)amount);
-        List<PlayerData> rs = queryBuilder.query();
-        for (val data : rs) {
-            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getCoins())));
+        try (PreparedStatement statement = this.prepareStatement(GET_COINS_TOP.replace("{COUNT_IN_TOP}", String.valueOf(amount)))) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), rs.getString("playerName"), String.valueOf(rs.getInt("coins"))));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Произошла ошибка при загрузке топа из MySQL ", e);
         }
         return list;
     }
 
     @Override
     public void close() {
-        this.connectionSource.closeQuietly();
+        this.hikariDataSource.close();
     }
 }

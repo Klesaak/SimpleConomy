@@ -14,6 +14,157 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern> com.zaxxer.hikari</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.zaxxer.hikari</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.postgresql</pattern>
+                                    <shadedPattern>ua.klesaak.libs.org.postgresql</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>waffle</pattern>
+                                    <shadedPattern>ua.klesaak.libs.waffle</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.sun</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.sun</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.mariadb.jdbc</pattern>
+                                    <shadedPattern>ua.klesaak.libs.org.mariadb</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.j2objc</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.annotation</pattern>
+                                    <shadedPattern>ua.klesaak.libs.javax</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.mysql</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.mysql</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>redis</pattern>
+                                    <shadedPattern>ua.klesaak.libs.redis</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>ua.klesaak.libs.org.apache</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>ua.klesaak.libs.org.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.github</pattern>
+                                    <shadedPattern>ua.klesaak.libs.com.github</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>waffle</pattern>
+                                    <shadedPattern>ua.klesaak.libs.waffle</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.slf4j</pattern>
+                                    <shadedPattern>ua.klesaak.libs.org.slf4j</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>gnu.trove</pattern>
+                                    <shadedPattern>ua.klesaak.libs.gnu.trove</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/maven/ua.klesaak/SimpleConomy/pom.xml</exclude>
+                                        <exclude>LICENSE</exclude>
+                                        <exclude>INFO_BIN</exclude>
+                                        <exclude>INFO_SRC</exclude>
+                                        <exclude>README</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>*:xml-apis</exclude>
+                                    <exclude>org.apache.maven:lib:tests</exclude>
+                                    <exclude>org.apache:org.apache</exclude>
+                                    <exclude>org.bukkit:bukkit</exclude>
+                                    <exclude>org.hamcrest:org.hamcrest</exclude>
+                                    <exclude>org.json:org.json</exclude>
+                                    <exclude>log4j:log4j:jar:</exclude>
+                                    <exclude>org.spigotmc</exclude>
+                                    <exclude>net.md_5</exclude>
+                                    <exclude>ua.vault</exclude>
+                                    <exclude>org.projectlombok</exclude>
+                                    <exclude>org.checkerframework</exclude>
+                                    <exclude>com.googlecode</exclude>
+                                    <exclude>org.hamcrest</exclude>
+                                    <exclude>com.google.protobuf</exclude>
+                                    <exclude>org.codehaus.mojo</exclude>
+                                    <exclude>org.yaml</exclude>
+                                    <exclude>com.google.errorprone</exclude>
+                                    <exclude>com.google.code</exclude>
+                                    <exclude>com.google.guava</exclude>
+                                    <exclude>org.opentest4j</exclude>
+                                    <exclude>org.apiguardian</exclude>
+                                    <exclude>junit.extensions</exclude>
+                                    <exclude>junit.framework</exclude>
+                                    <exclude>junit.runner</exclude>
+                                    <exclude>junit.textui</exclude>
+                                    <exclude>junit:junit:jar</exclude>
+                                    <exclude>org.junit.jupiter</exclude>
+                                    <exclude>org.junit.platform</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <repositories>
         <repository>
             <id>sonatype</id>
@@ -26,6 +177,10 @@
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -72,25 +227,20 @@
             <version>1.18.22</version>
             <scope>compile</scope>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.j256.ormlite/ormlite-jdbc -->
-        <dependency>
-            <groupId>com.j256.ormlite</groupId>
-            <artifactId>ormlite-jdbc</artifactId>
-            <version>6.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.j256.ormlite/ormlite-core -->
-        <dependency>
-            <groupId>com.j256.ormlite</groupId>
-            <artifactId>ormlite-core</artifactId>
-            <version>6.1</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.32</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+
     </dependencies>
 
 </project>

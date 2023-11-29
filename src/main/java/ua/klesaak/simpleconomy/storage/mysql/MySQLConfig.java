@@ -1,37 +1,37 @@
 package ua.klesaak.simpleconomy.storage.mysql;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
 import org.bukkit.configuration.ConfigurationSection;
+import ua.klesaak.simpleconomy.storage.StorageType;
 
-@Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
 public class MySQLConfig {
     public static final String PLAYER_COLUMN = "player_name";
     public static final String MONEY_COLUMN = "money";
     public static final String COINS_COLUMN = "coins";
-    int port;
-    String username, password, database, address, table;
-    boolean isUseSSL;
+    private final int port;
+    private final String username, password, database, address, table, driverName;
+    private final boolean isUseSSL;
 
-    public MySQLConfig(ConfigurationSection section) {
+    public MySQLConfig(ConfigurationSection section, StorageType storageType) {
         this.address = section.getString("host");
         this.port = section.getInt("port");
         this.username = section.getString("username");
         this.password = section.getString("password");
         this.database = section.getString("database");
         this.table = section.getString("table");
+        this.driverName = storageType.getIdentifier();
         this.isUseSSL = section.getBoolean("useSSL");
     }
 
     public String getHost() {
-        val builder = new StringBuilder("jdbc:mysql://");
-        builder.append(this.username);
-        builder.append(":");
-        builder.append(this.password);
-        builder.append("@");
+        val builder = new StringBuilder("jdbc:");
+        builder.append(this.driverName);
+        builder.append("://");
         builder.append(this.address);
+        builder.append(":");
+        builder.append(this.port);
         builder.append("/");
         builder.append(this.database);
         builder.append("?useUnicode=true&");

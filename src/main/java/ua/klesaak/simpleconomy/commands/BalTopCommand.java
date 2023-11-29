@@ -9,10 +9,7 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("money", "coins");
@@ -20,8 +17,8 @@ public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter
 
     public BalTopCommand(SimpleEconomyManager manager) {
         this.manager = manager;
-        this.manager.getPlugin().getCommand("baltop").setExecutor(this);
-        this.manager.getPlugin().getCommand("baltop").setTabCompleter(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("baltop")).setExecutor(this);
+        Objects.requireNonNull(this.manager.getPlugin().getCommand("baltop")).setTabCompleter(this);
     }
 
 

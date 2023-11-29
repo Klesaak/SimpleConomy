@@ -1,17 +1,17 @@
-#Доступные хранилища: mysql, redis, file
-storage: mysql
+#Доступные хранилища: mysql, mariadb, postgresql, redis, file
+storage: file
 
 #Будет ли функционировать команда /pay (актуально для серверов мини-игр)
 payCommandEnabled: true
 
-#Настройка mysql хранилища
-mysql:
+#Настройка mysql, mariadb, postgresql хранилища
+sql:
   host: localhost
   port: 3306
   database: db
-  username: mysql
-  password: mysql
-  table: 'scon_surv'
+  username: root
+  password: ""
+  table: "scon_surv"
   useSSL: false
 
 #Настройка redis хранилища
@@ -34,6 +34,8 @@ minTransactionSum: 100
 
 #Настройки топа.
 playerTop:
+  #Будет ли работать команда /baltop, обновления топа а так же плейсхолдеры в PAPI
+  isEnabled: true
   #Кол-во игроков в топе по монеткам.
   moneyCount: 10
   #Кол-во игроков в топе по коинам.

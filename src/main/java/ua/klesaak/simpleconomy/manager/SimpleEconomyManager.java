@@ -1,6 +1,7 @@
 package ua.klesaak.simpleconomy.manager;
 
 import lombok.Getter;
+import lombok.val;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,10 +20,11 @@ import ua.klesaak.simpleconomy.commands.PayCommand;
 import ua.klesaak.simpleconomy.configurations.ConfigFile;
 import ua.klesaak.simpleconomy.configurations.MessagesFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
-import ua.klesaak.simpleconomy.storage.IStorage;
+import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
 import ua.klesaak.simpleconomy.storage.mysql.MySQLStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
+import ua.klesaak.simpleconomy.utils.CommandMapUtils;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 import java.util.logging.Level;
@@ -35,7 +37,7 @@ public class SimpleEconomyManager implements Listener {
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
-    private volatile IStorage storage;
+    private volatile AbstractStorage storage;
     private TopManager topManager;
     private PAPIExpansion papiExpansion;
 
@@ -54,29 +56,35 @@ public class SimpleEconomyManager implements Listener {
         //================COMMANDS================\\
         new AdminCommands(this);
         new BalanceCommand(this);
-        new BalTopCommand(this);
         if (this.configFile.isPayCommandEnabled()) new PayCommand(this);
         //================COMMANDS================\\
-        this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             this.papiExpansion = new PAPIExpansion(this);
             this.papiExpansion.register();
         }
         SimpleEconomyAPI.register(this);
+        if (this.configFile.isTopEnabled()) {
+            this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
+            new BalTopCommand(this);
+            return;
+        }
+        CommandMapUtils.unRegisterCommand("baltop");
     }
 
     private void initStorage() {
-        String storageType = this.configFile.getStorage().toLowerCase();
+        val storageType = this.configFile.getStorageType();
         switch (storageType) {
-            case "file": {
+            case FILE: {
                 this.storage = new JsonStorage(this);
                 break;
             }
-            case "mysql": {
+            case POSTGRESQL:
+            case MARIADB:
+            case MYSQL: {
                 this.storage = new MySQLStorage(this);
                 break;
             }
-            case "redis": {
+            case REDIS: {
                 this.storage = new RedisStorage(this);
                 break;
             }

@@ -1,10 +1,9 @@
 package ua.klesaak.simpleconomy.configurations;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
+import ua.klesaak.simpleconomy.storage.StorageType;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
@@ -15,15 +14,16 @@ import java.text.DecimalFormatSymbols;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-@Getter @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
 public class ConfigFile extends PluginConfig {
-    String storage;
-    int maxBalance, maxCoins, startBalance, startCoins, minTransactionSum;
-    int playerTopMoneyCount, playerTopCoinsCount, playerTopUpdateTickInterval;
-    String topFormat;
-    boolean payCommandEnabled;
-    String currencyFormatPlural, currencyFormatSingular, currencyFormatPlural2, currencyCoinsFormatPlural, currencyCoinsFormatSingular, currencyCoinsFormatPlural2;
-
+    private final String storage;
+    private final int maxBalance, maxCoins, startBalance, startCoins, minTransactionSum;
+    private final int playerTopMoneyCount, playerTopCoinsCount, playerTopUpdateTickInterval;
+    private final String topFormat;
+    private final boolean isTopEnabled;
+    private final boolean payCommandEnabled;
+    private final String currencyFormatPlural, currencyFormatSingular, currencyFormatPlural2, currencyCoinsFormatPlural, currencyCoinsFormatSingular, currencyCoinsFormatPlural2;
+    private final StorageType storageType;
 
     public ConfigFile(JavaPlugin plugin) {
         super(plugin, "config.yml");
@@ -34,6 +34,7 @@ public class ConfigFile extends PluginConfig {
         this.startBalance = this.getInt("startBalance");
         this.startCoins = this.getInt("startCoins");
         this.minTransactionSum = this.getInt("minTransactionSum");
+        this.isTopEnabled = this.getBoolean("playerTop.isEnabled");
         this.playerTopMoneyCount = this.getInt("playerTop.moneyCount");
         this.playerTopCoinsCount = this.getInt("playerTop.coinsCount");
         this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) * 20);
@@ -44,6 +45,7 @@ public class ConfigFile extends PluginConfig {
         this.currencyCoinsFormatPlural = this.getString("currencyCoinsFormat.plural");
         this.currencyCoinsFormatSingular = this.getString("currencyCoinsFormat.singular");
         this.currencyCoinsFormatPlural2 = this.getString("currencyCoinsFormat.plural2");
+        this.storageType = StorageType.parse(this.storage, StorageType.FILE);
     }
 
     public String formatTopLine(String index, String player, String balance) {
@@ -54,8 +56,8 @@ public class ConfigFile extends PluginConfig {
         return format;
     }
 
-    public ConfigurationSection getMySQLSection() {
-        return this.getConfigurationSection("mysql");
+    public ConfigurationSection getSQLSection() {
+        return this.getConfigurationSection("sql");
     }
 
     public ConfigurationSection getRedisSection() {

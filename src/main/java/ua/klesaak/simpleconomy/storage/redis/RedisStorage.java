@@ -1,21 +1,15 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
-import org.bukkit.Bukkit;
-import ua.klesaak.simpleconomy.manager.PlayerData;
+import ua.klesaak.simpleconomy.storage.PlayerData;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.storage.IStorage;
+import ua.klesaak.simpleconomy.storage.AbstractStorage;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class RedisStorage implements IStorage {
-    private final SimpleEconomyManager manager;
-    Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
+public class RedisStorage extends AbstractStorage {
 
     public RedisStorage(SimpleEconomyManager manager) {
-        this.manager = manager;
+        super(manager);
     }
 
     @Override

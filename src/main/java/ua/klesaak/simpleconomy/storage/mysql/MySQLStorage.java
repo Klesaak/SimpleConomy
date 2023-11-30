@@ -6,6 +6,10 @@ import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.PlayerData;
+import ua.klesaak.simpleconomy.storage.mysql.driver.AbstractConnectionFactory;
+import ua.klesaak.simpleconomy.storage.mysql.driver.MariaDbConnectionFactory;
+import ua.klesaak.simpleconomy.storage.mysql.driver.MySqlConnectionFactory;
+import ua.klesaak.simpleconomy.storage.mysql.driver.PostgresConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class MySQLStorage extends AbstractStorage {
     public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {TABLE} (playerName VARCHAR(16) NOT NULL UNIQUE, money BIGINT DEFAULT 0 , coins BIGINT DEFAULT 0 ) ENGINE = InnoDB; ";
@@ -29,14 +32,30 @@ public class MySQLStorage extends AbstractStorage {
     public MySQLStorage(SimpleEconomyManager manager) {
         super(manager);
         val configFile = manager.getConfigFile();
-        this.mySQLConfig = new MySQLConfig(configFile.getSQLSection(), configFile.getStorageType());
-        this.hikariDataSource = new HikariDataSource();
-        this.hikariDataSource.setJdbcUrl(this.mySQLConfig.getHost());
-        this.hikariDataSource.setMaximumPoolSize(3);
-        this.hikariDataSource.setPoolName("SimpleConomy-pool");
-        this.hikariDataSource.setMaxLifetime(TimeUnit.MINUTES.toMillis(30L));
-        this.hikariDataSource.setUsername(this.mySQLConfig.getUsername());
-        this.hikariDataSource.setPassword(this.mySQLConfig.getPassword());
+        this.mySQLConfig = new MySQLConfig(configFile.getSQLSection());
+        AbstractConnectionFactory connectionFactory = new MySqlConnectionFactory(null, null, null, null, null, false);
+        switch (configFile.getStorageType()) {
+            case MARIADB: {
+                connectionFactory = new MariaDbConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
+                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
+                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                break;
+            }
+            case MYSQL: {
+                connectionFactory = new MySqlConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
+                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
+                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                break;
+            }
+            case POSTGRESQL: {
+                connectionFactory = new PostgresConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
+                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
+                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                break;
+            }
+        }
+
+        this.hikariDataSource = new HikariDataSource(connectionFactory.getHikariConfig());
 
         try (val con = this.hikariDataSource.getConnection(); val statement = this.prepareStatement(con, CREATE_TABLE)) {
             statement.execute();

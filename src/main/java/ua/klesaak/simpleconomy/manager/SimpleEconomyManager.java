@@ -24,12 +24,12 @@ import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
 import ua.klesaak.simpleconomy.storage.mysql.MySQLStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
-import ua.klesaak.simpleconomy.utils.CommandMapUtils;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 import java.util.logging.Level;
 
 //todo нормальный reload
+//todo нормальное кеширование в mysql, но пока так норм робит
 //todo redis
 
 @Getter
@@ -43,7 +43,7 @@ public class SimpleEconomyManager implements Listener {
 
     public SimpleEconomyManager(SimpleConomyPlugin plugin) {
         this.plugin = plugin;
-        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("Vault")) {
             this.plugin.getLogger().log(Level.SEVERE, "Vault is not found! Disabling...");
             Bukkit.getPluginManager().disablePlugin(this.plugin);
             return;
@@ -64,11 +64,9 @@ public class SimpleEconomyManager implements Listener {
         }
         SimpleEconomyAPI.register(this);
         if (this.configFile.isTopEnabled()) {
-            this.topManager = new TopManager(this, this.configFile.getPlayerTopMoneyCount(), this.configFile.getPlayerTopCoinsCount(), this.configFile.getPlayerTopUpdateTickInterval());
+            this.topManager = new TopManager(this, this.configFile);
             new BalTopCommand(this);
-            return;
         }
-        CommandMapUtils.unRegisterCommand("baltop");
     }
 
     private void initStorage() {

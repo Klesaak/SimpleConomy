@@ -25,7 +25,6 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
 
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
-        this.cmdVerifyPermission(sender, "simpleconomy.admin", ChatColor.RED + "Нет прав.");
         if (args.length == 0) {
             sender.sendMessage(ChatColor.GOLD + manager.getPlugin().getDescription().getName() + " v" + manager.getPlugin().getDescription().getVersion() + ChatColor.RED + " by Klesaak");
             sender.sendMessage("");

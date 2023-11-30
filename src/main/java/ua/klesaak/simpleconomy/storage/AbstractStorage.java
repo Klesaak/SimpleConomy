@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractStorage {
+public abstract class AbstractStorage implements AutoCloseable {
     protected final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
     protected final SimpleEconomyManager manager;
 
@@ -42,5 +42,6 @@ public abstract class AbstractStorage {
     public abstract List<String> getMoneyTop(int amount);
     public abstract List<String> getCoinsTop(int amount);
 
+    @Override
     public abstract void close();
 }

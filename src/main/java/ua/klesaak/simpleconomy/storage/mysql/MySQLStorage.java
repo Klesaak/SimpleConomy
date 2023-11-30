@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class MySQLStorage extends AbstractStorage {
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {TABLE} (playerName VARCHAR(16) NOT NULL UNIQUE, money BIGINT DEFAULT 0 , coins BIGINT DEFAULT 0 ) ENGINE = InnoDB; ";
-    public static final String INSERT_PLAYER = "INSERT INTO {TABLE} (playerName, money, coins) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE playerName=?, money=?, coins=?"; //executeUpdate()
-    public static final String GET_PLAYER_DATA = "SELECT money, coins FROM {TABLE} WHERE playerName=?"; //executeQuery()
-    public static final String GET_MONEY_TOP = "SELECT playerName, money FROM {TABLE} ORDER BY money DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
-    public static final String GET_COINS_TOP = "SELECT playerName, coins FROM {TABLE} ORDER BY coins DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
-    public static final String DELETE_PLAYER = "DELETE FROM {TABLE} WHERE playerName=?"; //execute()
+    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS %s (playerName VARCHAR(16) NOT NULL UNIQUE, money BIGINT DEFAULT 0 , coins BIGINT DEFAULT 0 ) ENGINE = InnoDB; ";
+    public static final String INSERT_PLAYER = "INSERT INTO %s (playerName, money, coins) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE playerName=?, money=?, coins=?"; //executeUpdate()
+    public static final String GET_PLAYER_DATA = "SELECT money, coins FROM %s WHERE playerName=?"; //executeQuery()
+    public static final String GET_MONEY_TOP = "SELECT playerName, money FROM %s ORDER BY money DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
+    public static final String GET_COINS_TOP = "SELECT playerName, coins FROM %s ORDER BY coins DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
+    public static final String DELETE_PLAYER = "DELETE FROM %s WHERE playerName=?"; //execute()
     private final HikariDataSource hikariDataSource;
     private final MySQLConfig mySQLConfig;
 
@@ -65,7 +65,7 @@ public class MySQLStorage extends AbstractStorage {
     }
 
     private PreparedStatement prepareStatement(Connection connection, String sql) throws SQLException {
-        return connection.prepareStatement(sql.replace("{TABLE}", this.mySQLConfig.getTable()));
+        return connection.prepareStatement(String.format(sql, this.mySQLConfig.getTable()));
     }
 
     private PlayerData loadPlayer(String nickName) {

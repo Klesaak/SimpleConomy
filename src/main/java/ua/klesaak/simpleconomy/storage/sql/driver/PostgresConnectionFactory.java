@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.storage.mysql.driver;
+package ua.klesaak.simpleconomy.storage.sql.driver;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,0 +1,1 @@
+SELECT playerName, coins FROM `%tableName%` ORDER BY coins DESC LIMIT %countInTop%;

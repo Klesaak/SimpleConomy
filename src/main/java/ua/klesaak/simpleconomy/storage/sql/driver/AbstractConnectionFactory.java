@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.storage.mysql.driver;
+package ua.klesaak.simpleconomy.storage.sql.driver;
 
 import com.zaxxer.hikari.HikariConfig;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public abstract class AbstractConnectionFactory {
         this.overrideProperties();
         this.hikariConfig.setJdbcUrl(this.getHost(address, port == null ? this.defaultPort() : port, database));
         this.hikariConfig.setMaximumPoolSize(3);
-        this.hikariConfig.setPoolName("SimpleConomy-pool");
+        this.hikariConfig.setPoolName("simpleconomy-pool");
         this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(30L));
         this.hikariConfig.setUsername(userName);
         this.hikariConfig.setPassword(passWord);

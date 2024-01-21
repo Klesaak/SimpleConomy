@@ -1,14 +1,11 @@
 package ua.klesaak.simpleconomy.vault;
 
 import lombok.experimental.UtilityClass;
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
-import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 @UtilityClass
 public class VaultUtils {

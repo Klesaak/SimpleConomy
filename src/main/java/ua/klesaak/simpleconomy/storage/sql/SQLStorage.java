@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.storage.mysql;
+package ua.klesaak.simpleconomy.storage.sql;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
@@ -6,72 +6,74 @@ import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.PlayerData;
-import ua.klesaak.simpleconomy.storage.mysql.driver.AbstractConnectionFactory;
-import ua.klesaak.simpleconomy.storage.mysql.driver.MariaDbConnectionFactory;
-import ua.klesaak.simpleconomy.storage.mysql.driver.MySqlConnectionFactory;
-import ua.klesaak.simpleconomy.storage.mysql.driver.PostgresConnectionFactory;
+import ua.klesaak.simpleconomy.storage.sql.driver.AbstractConnectionFactory;
+import ua.klesaak.simpleconomy.storage.sql.driver.MariaDbConnectionFactory;
+import ua.klesaak.simpleconomy.storage.sql.driver.MySqlConnectionFactory;
+import ua.klesaak.simpleconomy.storage.sql.driver.PostgresConnectionFactory;
 
-import java.sql.Connection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-public class MySQLStorage extends AbstractStorage {
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS %s (playerName VARCHAR(16) NOT NULL UNIQUE, money BIGINT DEFAULT 0 , coins BIGINT DEFAULT 0 ) ENGINE = InnoDB; ";
+public class SQLStorage extends AbstractStorage {
+    public final String createTableSql;
     public static final String INSERT_PLAYER = "INSERT INTO %s (playerName, money, coins) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE playerName=?, money=?, coins=?"; //executeUpdate()
-    public static final String GET_PLAYER_DATA = "SELECT money, coins FROM %s WHERE playerName=?"; //executeQuery()
-    public static final String GET_MONEY_TOP = "SELECT playerName, money FROM %s ORDER BY money DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
-    public static final String GET_COINS_TOP = "SELECT playerName, coins FROM %s ORDER BY coins DESC LIMIT {COUNT_IN_TOP}"; //executeQuery()
-    public static final String DELETE_PLAYER = "DELETE FROM %s WHERE playerName=?"; //execute()
+    public final String fetchPlayerSql;
+    public final String getMoneyTopSql;
+    public final String getCoinsTopSql;
+    public final String deletePlayerSql;
     private final HikariDataSource hikariDataSource;
-    private final MySQLConfig mySQLConfig;
 
-    public MySQLStorage(SimpleEconomyManager manager) {
+    public SQLStorage(SimpleEconomyManager manager) {
         super(manager);
         val configFile = manager.getConfigFile();
-        this.mySQLConfig = new MySQLConfig(configFile.getSQLSection());
+        val sqlConfig = new SQLConfig(configFile.getSQLSection());
+        this.createTableSql = this.loadSQL("createTables", "%tableName%", sqlConfig.getTable());
+        this.fetchPlayerSql = this.loadSQL("fetchPlayer", "%tableName%", sqlConfig.getTable());
+        this.getMoneyTopSql = this.loadSQL("getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopMoneyCount()));
+        this.getCoinsTopSql = this.loadSQL("getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopCoinsCount()));
+        this.deletePlayerSql = this.loadSQL("deletePlayer", "%tableName%", sqlConfig.getTable());
         AbstractConnectionFactory connectionFactory = new MySqlConnectionFactory(null, null, null, null, null, false);
         switch (configFile.getStorageType()) {
             case MARIADB: {
-                connectionFactory = new MariaDbConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
-                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
-                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                connectionFactory = new MariaDbConnectionFactory(sqlConfig.getUsername(), sqlConfig.getPassword(),
+                        sqlConfig.getAddress(), sqlConfig.getPort(),
+                        sqlConfig.getDatabase(), sqlConfig.isUseSSL());
                 break;
             }
             case MYSQL: {
-                connectionFactory = new MySqlConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
-                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
-                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                connectionFactory = new MySqlConnectionFactory(sqlConfig.getUsername(), sqlConfig.getPassword(),
+                        sqlConfig.getAddress(), sqlConfig.getPort(),
+                        sqlConfig.getDatabase(), sqlConfig.isUseSSL());
                 break;
             }
             case POSTGRESQL: {
-                connectionFactory = new PostgresConnectionFactory(this.mySQLConfig.getUsername(), this.mySQLConfig.getPassword(),
-                        this.mySQLConfig.getAddress(), this.mySQLConfig.getPort(),
-                        this.mySQLConfig.getDatabase(), this.mySQLConfig.isUseSSL());
+                connectionFactory = new PostgresConnectionFactory(sqlConfig.getUsername(), sqlConfig.getPassword(),
+                        sqlConfig.getAddress(), sqlConfig.getPort(),
+                        sqlConfig.getDatabase(), sqlConfig.isUseSSL());
                 break;
             }
         }
 
         this.hikariDataSource = new HikariDataSource(connectionFactory.getHikariConfig());
-
-        try (val con = this.hikariDataSource.getConnection(); val statement = this.prepareStatement(con, CREATE_TABLE)) {
-            statement.execute();
-        } catch (SQLException e) {
-            manager.getPlugin().getLogger().severe("Ошибка при создании таблицы MySQL " + e);
-        }
-    }
-
-    private PreparedStatement prepareStatement(Connection connection, String sql) throws SQLException {
-        return connection.prepareStatement(String.format(sql, this.mySQLConfig.getTable()));
+        this.executeSQL(this.createTableSql);
     }
 
     private PlayerData loadPlayer(String nickName) {
         return CompletableFuture.supplyAsync(()-> {
             PlayerData  playerData = null;
-            try (val con = this.hikariDataSource.getConnection(); val statement = this.prepareStatement(con, GET_PLAYER_DATA)) {
+            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(this.fetchPlayerSql)) {
                 statement.setString(1, nickName);
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
@@ -93,7 +95,7 @@ public class MySQLStorage extends AbstractStorage {
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
         CompletableFuture.runAsync(() -> {
-            try (val con = this.hikariDataSource.getConnection(); val statement = this.prepareStatement(con, INSERT_PLAYER)) {
+            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(INSERT_PLAYER)) {
                 statement.setString(1, nickName);
                 statement.setString(2, String.valueOf((int) playerData.getMoney()));
                 statement.setString(3, String.valueOf(playerData.getCoins()));
@@ -219,7 +221,7 @@ public class MySQLStorage extends AbstractStorage {
     @Override
     public void deleteAccount(String nickName) {
         CompletableFuture.runAsync(() -> {
-            try (val con = this.hikariDataSource.getConnection(); val preparedStatement = this.prepareStatement(con, DELETE_PLAYER)) {
+            try (val con = this.hikariDataSource.getConnection(); val preparedStatement = con.prepareStatement(this.deletePlayerSql)) {
                 preparedStatement.setString(1, nickName);
                 preparedStatement.execute();
             } catch (SQLException ex) {
@@ -234,7 +236,7 @@ public class MySQLStorage extends AbstractStorage {
     @Override @SneakyThrows()
     public List<String> getMoneyTop(int amount) {
         List<String> list = new ArrayList<>(128);
-        try (val con = this.hikariDataSource.getConnection(); val statement = this.prepareStatement(con, GET_MONEY_TOP.replace("{COUNT_IN_TOP}", String.valueOf(amount)))) {
+        try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(this.getMoneyTopSql)) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), rs.getString("playerName"), String.valueOf(rs.getDouble("money"))));
@@ -249,7 +251,7 @@ public class MySQLStorage extends AbstractStorage {
     @Override @SneakyThrows()
     public List<String> getCoinsTop(int amount) {
         List<String> list = new ArrayList<>(128);
-        try (val con = this.hikariDataSource.getConnection(); PreparedStatement statement = this.prepareStatement(con, GET_COINS_TOP.replace("{COUNT_IN_TOP}", String.valueOf(amount)))) {
+        try (val con = this.hikariDataSource.getConnection(); PreparedStatement statement = con.prepareStatement(this.getCoinsTopSql)) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), rs.getString("playerName"), String.valueOf(rs.getInt("coins"))));
@@ -259,6 +261,42 @@ public class MySQLStorage extends AbstractStorage {
             throw new RuntimeException("Произошла ошибка при загрузке топа из MySQL ", e);
         }
         return list;
+    }
+
+    private void executeSQL(String sql) {
+        Collection<String> sqlList = new ArrayList<>(16);
+        if (!sql.contains(";")) throw new IllegalArgumentException("Missed ';' in sql line: '" + sql + "'");
+        sqlList.addAll(Arrays.asList(sql.split(";")));
+        sqlList.forEach(sqlLine -> {
+            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(sqlLine)) {
+                statement.execute();
+            } catch (SQLException e) {
+                manager.getPlugin().getLogger().severe("Error while executeSQL data" + e.getMessage());
+            }
+        });
+    }
+
+    private String loadSQL(String name, String... placeholders) {
+        String sqlFile = "sql/" + name + ".sql";
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(sqlFile)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Could not find " + sqlFile);
+            }
+            val bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            String sqlLine = bufferedReader.lines().filter(line -> !line.trim().isEmpty() && !line.trim().startsWith("--")).collect(Collectors.joining(" "));
+            if (placeholders.length == 0) return sqlLine;
+            int i = 0;
+            for (String placeholder : placeholders) {
+                if (i % 2 == 0) {
+                    sqlLine = sqlLine.replace(placeholder, placeholders[i + 1]);
+                }
+                ++i;
+            }
+            return sqlLine;
+        } catch (IOException e) {
+            manager.getPlugin().getLogger().severe("Error while load SQL file!");
+        }
+        return "";
     }
 
     @Override

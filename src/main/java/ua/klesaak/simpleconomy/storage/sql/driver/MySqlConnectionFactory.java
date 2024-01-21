@@ -1,16 +1,17 @@
-package ua.klesaak.simpleconomy.storage.mysql.driver;
+package ua.klesaak.simpleconomy.storage.sql.driver;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MariaDbConnectionFactory extends AbstractConnectionFactory{
-    public MariaDbConnectionFactory(String userName, String passWord, String address, String port, String database, boolean isUseSSL) {
+public class MySqlConnectionFactory extends AbstractConnectionFactory {
+
+    public MySqlConnectionFactory(String userName, String passWord, String address, String port, String database, boolean isUseSSL) {
         super(userName, passWord, address, port, database, isUseSSL);
     }
 
     @Override
     protected String getImplementationName() {
-        return "MariaDB";
+        return "MySQL";
     }
 
     @Override
@@ -20,12 +21,12 @@ public class MariaDbConnectionFactory extends AbstractConnectionFactory{
 
     @Override
     protected String driverClassName() {
-        return "org.mariadb.jdbc.Driver";
+        return "com.mysql.cj.jdbc.Driver";
     }
 
     @Override
     protected String driverJdbcIdentifier() {
-        return "mariadb";
+        return "mysql";
     }
 
     @Override

@@ -1,0 +1,1 @@
+SELECT playerName, money FROM `%tableName%` ORDER BY money DESC LIMIT %countInTop%;

@@ -22,14 +22,13 @@ import ua.klesaak.simpleconomy.configurations.MessagesFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
-import ua.klesaak.simpleconomy.storage.mysql.MySQLStorage;
+import ua.klesaak.simpleconomy.storage.sql.SQLStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 import java.util.logging.Level;
 
 //todo нормальный reload
-//todo нормальное кеширование в mysql, но пока так норм робит
 //todo redis
 
 @Getter
@@ -79,7 +78,7 @@ public class SimpleEconomyManager implements Listener {
             case POSTGRESQL:
             case MARIADB:
             case MYSQL: {
-                this.storage = new MySQLStorage(this);
+                this.storage = new SQLStorage(this);
                 break;
             }
             case REDIS: {

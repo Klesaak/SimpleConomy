@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.LoadBefore;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.Description;
@@ -16,8 +17,10 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 
 @Plugin(name = "SimpleConomy", version = "0.1")
 @Author("Klesaak")
-@Dependency("Vault")
-@SoftDependency("PlaceholderAPI")
+@SoftDependsOn({
+        @SoftDependency("PlaceholderAPI"),
+        @SoftDependency("Vault")
+})
 @LoadBefore("PlaceholderAPI")
 @Commands({
         @Command(name = "sconomy", aliases = {"scon", "seco"}, desc = "Admin command.", permission = "simpleconomy.admin"),

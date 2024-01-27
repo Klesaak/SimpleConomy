@@ -192,7 +192,6 @@ public class JsonStorage extends AbstractStorage {
         for (val data : dataList) {
             list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getCoins())));
         }
-        Collections.reverse(list);
         return list;
     }
 

@@ -91,12 +91,12 @@ public class SimpleEconomyManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
-        this.storage.cachePlayer(event.getPlayer().getName());
+        this.storage.cachePlayer(event.getPlayer().getName().toLowerCase());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLeave(PlayerQuitEvent event) {
-        this.storage.unCachePlayer(event.getPlayer().getName());
+        this.storage.unCachePlayer(event.getPlayer().getName().toLowerCase());
     }
 
     public String reload() {

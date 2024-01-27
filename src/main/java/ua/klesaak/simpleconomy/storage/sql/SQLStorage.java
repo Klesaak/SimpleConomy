@@ -24,11 +24,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class SQLStorage extends AbstractStorage {
     public final String createTableSql;
-    public static final String INSERT_PLAYER = "INSERT INTO %s (playerName, money, coins) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE playerName=?, money=?, coins=?"; //executeUpdate()
+    public final String insertPlayerSql;
     public final String fetchPlayerSql;
     public final String getMoneyTopSql;
     public final String getCoinsTopSql;
@@ -40,10 +41,11 @@ public class SQLStorage extends AbstractStorage {
         val configFile = manager.getConfigFile();
         val sqlConfig = new SQLConfig(configFile.getSQLSection());
         this.createTableSql = this.loadSQL("createTables", "%tableName%", sqlConfig.getTable());
-        this.fetchPlayerSql = this.loadSQL("fetchPlayer", "%tableName%", sqlConfig.getTable());
-        this.getMoneyTopSql = this.loadSQL("getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopMoneyCount()));
-        this.getCoinsTopSql = this.loadSQL("getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopCoinsCount()));
-        this.deletePlayerSql = this.loadSQL("deletePlayer", "%tableName%", sqlConfig.getTable());
+        this.fetchPlayerSql = this.loadSQL("fetch/fetchPlayer", "%tableName%", sqlConfig.getTable());
+        this.getMoneyTopSql = this.loadSQL("fetch/getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopMoneyCount()));
+        this.getCoinsTopSql = this.loadSQL("fetch/getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopCoinsCount()));
+        this.deletePlayerSql = this.loadSQL("update/deletePlayer", "%tableName%", sqlConfig.getTable());
+        this.insertPlayerSql = this.loadSQL("update/insertPlayer", "%tableName%", sqlConfig.getTable());
         AbstractConnectionFactory connectionFactory = new MySqlConnectionFactory(null, null, null, null, null, false);
         switch (configFile.getStorageType()) {
             case MARIADB: {
@@ -87,7 +89,7 @@ public class SQLStorage extends AbstractStorage {
             }
             return playerData;
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
         }).join();
     }
@@ -95,7 +97,7 @@ public class SQLStorage extends AbstractStorage {
     @Override
     public void savePlayer(String nickName, PlayerData playerData) {
         CompletableFuture.runAsync(() -> {
-            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(INSERT_PLAYER)) {
+            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(this.insertPlayerSql)) {
                 statement.setString(1, nickName);
                 statement.setString(2, String.valueOf((int) playerData.getMoney()));
                 statement.setString(3, String.valueOf(playerData.getCoins()));
@@ -108,7 +110,7 @@ public class SQLStorage extends AbstractStorage {
             }
 
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
         });
     }
@@ -228,7 +230,7 @@ public class SQLStorage extends AbstractStorage {
                 throw new RuntimeException("Произошла ошибка при удалении данных из MySQL", ex);
             }
         }).exceptionally(throwable -> {
-            throwable.printStackTrace();
+            this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
         });
     }

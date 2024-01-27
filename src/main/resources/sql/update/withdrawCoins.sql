@@ -1,0 +1,1 @@
+UPDATE %tableName% SET coins = coins - ? WHERE playername = ? AND coins >= ? LIMIT 1;

@@ -42,14 +42,11 @@ public class SimpleEconomyManager implements Listener {
 
     public SimpleEconomyManager(SimpleConomyPlugin plugin) {
         this.plugin = plugin;
-        if (!Bukkit.getPluginManager().isPluginEnabled("Vault")) {
-            this.plugin.getLogger().log(Level.SEVERE, "Vault is not found! Disabling...");
-            Bukkit.getPluginManager().disablePlugin(this.plugin);
-            return;
+        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+            Bukkit.getServicesManager().register(Economy.class, new VaultEconomyHook(this), this.plugin, ServicePriority.Highest);
         }
         this.configFile = new ConfigFile(this.plugin);
         this.messagesFile = new MessagesFile(this.plugin);
-        Bukkit.getServicesManager().register(Economy.class, new VaultEconomyHook(this), this.plugin, ServicePriority.Highest);;
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
         this.initStorage();
         //================COMMANDS================\\

@@ -11,23 +11,15 @@ import ua.klesaak.simpleconomy.storage.sql.driver.MariaDbConnectionFactory;
 import ua.klesaak.simpleconomy.storage.sql.driver.MySqlConnectionFactory;
 import ua.klesaak.simpleconomy.storage.sql.driver.PostgresConnectionFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-public class SQLStorage extends AbstractStorage {
+public class SQLStorage extends AbstractStorage implements SQLLoader {
     public final String createTableSql;
     public final String insertPlayerSql;
     public final String fetchPlayerSql;
@@ -69,7 +61,7 @@ public class SQLStorage extends AbstractStorage {
         }
 
         this.hikariDataSource = new HikariDataSource(connectionFactory.getHikariConfig());
-        this.executeSQL(this.createTableSql);
+        this.executeSQL(this.hikariDataSource, this.createTableSql);
     }
 
     private PlayerData loadPlayer(String nickName) {
@@ -263,42 +255,6 @@ public class SQLStorage extends AbstractStorage {
             throw new RuntimeException("Произошла ошибка при загрузке топа из MySQL ", e);
         }
         return list;
-    }
-
-    private void executeSQL(String sql) {
-        Collection<String> sqlList = new ArrayList<>(16);
-        if (!sql.contains(";")) throw new IllegalArgumentException("Missed ';' in sql line: '" + sql + "'");
-        sqlList.addAll(Arrays.asList(sql.split(";")));
-        sqlList.forEach(sqlLine -> {
-            try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(sqlLine)) {
-                statement.execute();
-            } catch (SQLException e) {
-                manager.getPlugin().getLogger().severe("Error while executeSQL data" + e.getMessage());
-            }
-        });
-    }
-
-    private String loadSQL(String name, String... placeholders) {
-        String sqlFile = "sql/" + name + ".sql";
-        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(sqlFile)) {
-            if (inputStream == null) {
-                throw new IllegalArgumentException("Could not find " + sqlFile);
-            }
-            val bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            String sqlLine = bufferedReader.lines().filter(line -> !line.trim().isEmpty() && !line.trim().startsWith("--")).collect(Collectors.joining(" "));
-            if (placeholders.length == 0) return sqlLine;
-            int i = 0;
-            for (String placeholder : placeholders) {
-                if (i % 2 == 0) {
-                    sqlLine = sqlLine.replace(placeholder, placeholders[i + 1]);
-                }
-                ++i;
-            }
-            return sqlLine;
-        } catch (IOException e) {
-            manager.getPlugin().getLogger().severe("Error while load SQL file!");
-        }
-        return "";
     }
 
     @Override

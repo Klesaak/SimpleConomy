@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.storage.sql;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.SneakyThrows;
 import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
@@ -34,8 +33,8 @@ public class SQLStorage extends AbstractStorage implements SQLLoader {
         val sqlConfig = new SQLConfig(configFile.getSQLSection());
         this.createTableSql = this.loadSQL("createTables", "%tableName%", sqlConfig.getTable());
         this.fetchPlayerSql = this.loadSQL("fetch/fetchPlayer", "%tableName%", sqlConfig.getTable());
-        this.getMoneyTopSql = this.loadSQL("fetch/getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopMoneyCount()));
-        this.getCoinsTopSql = this.loadSQL("fetch/getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", String.valueOf(configFile.getPlayerTopCoinsCount()));
+        this.getMoneyTopSql = this.loadSQL("fetch/getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopMoneyCount());
+        this.getCoinsTopSql = this.loadSQL("fetch/getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopCoinsCount());
         this.deletePlayerSql = this.loadSQL("update/deletePlayer", "%tableName%", sqlConfig.getTable());
         this.insertPlayerSql = this.loadSQL("update/insertPlayer", "%tableName%", sqlConfig.getTable());
         AbstractConnectionFactory connectionFactory = new MySqlConnectionFactory(null, null, null, null, null, false);
@@ -227,7 +226,7 @@ public class SQLStorage extends AbstractStorage implements SQLLoader {
         });
     }
 
-    @Override @SneakyThrows()
+    @Override
     public List<String> getMoneyTop(int amount) {
         List<String> list = new ArrayList<>(128);
         try (val con = this.hikariDataSource.getConnection(); val statement = con.prepareStatement(this.getMoneyTopSql)) {
@@ -242,7 +241,7 @@ public class SQLStorage extends AbstractStorage implements SQLLoader {
         return list;
     }
 
-    @Override @SneakyThrows()
+    @Override
     public List<String> getCoinsTop(int amount) {
         List<String> list = new ArrayList<>(128);
         try (val con = this.hikariDataSource.getConnection(); PreparedStatement statement = con.prepareStatement(this.getCoinsTopSql)) {

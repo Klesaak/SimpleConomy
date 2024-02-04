@@ -9,6 +9,8 @@ import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
 import java.util.Objects;
 
+import static ua.klesaak.simpleconomy.configurations.MessagesFile.*;
+
 public class PayCommand extends AbstractBukkitCommand {
     private final SimpleEconomyManager manager;
 
@@ -20,46 +22,57 @@ public class PayCommand extends AbstractBukkitCommand {
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
+        String senderLC = playerSender.getName().toLowerCase();
         val messagesFile = this.manager.getMessagesFile();
         if (args.length != 2) {
-            messagesFile.sendVaultPayUsage(sender, label);
+            messagesFile.getVaultPayUsage().tag(LABEL_PATTERN, label).send(sender);
             return;
         }
         val config = this.manager.getConfigFile();
         val storage = this.manager.getStorage();
+        val senderData = storage.getPlayer(senderLC);
         val playerName = args[0];
+        val playerNameLC = playerName.toLowerCase();
         int sum = 0;
         try {
             sum = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            messagesFile.sendNotInteger(sender, args[1]);
+            messagesFile.getNotInteger().tag(NUMBER_PATTERN, args[1]).send(sender);
         }
         if (playerSender.getName().equalsIgnoreCase(playerName)) {
-            messagesFile.sendPaySelf(sender);
+            messagesFile.getPaySelf().send(sender);
             return;
         }
         val receiver = Bukkit.getPlayerExact(playerName);
         if (receiver == null) {
-            messagesFile.sendPlayerNotFound(sender);
+            messagesFile.getPlayerNotFound().send(sender);
             return;
         }
-        val receiverBalance = storage.getPlayer(playerName.toLowerCase()).getMoney();
-        if (!storage.hasMoney(playerSender.getName().toLowerCase(), sum)) {
-            messagesFile.sendVaultNoMoney(sender, config.formatMoney(storage.getPlayer(playerSender.getName().toLowerCase()).getMoney()));
+        val receiverBalance = storage.getPlayer(playerNameLC).getMoney();
+        if (senderData.getMoney() < sum) {
+            messagesFile.getVaultNoMoney().tag(BALANCE_PATTERN, config.formatMoney(senderData.getMoney())).send(sender);
             return;
         }
         if (config.getMinTransactionSum() > sum) {
-            messagesFile.sendErrorMinTransaction(sender, String.valueOf(config.getMinTransactionSum()), String.valueOf(sum));
+            messagesFile.getErrorMinTransaction().tag(SUM_PATTERN, config.getMinTransactionSum()).tag(MONEY_PATTERN, sum).send(sender);
             return;
         }
         if (receiverBalance + sum > config.getMaxBalance()) {
-            messagesFile.sendVaultPayErrorMaxBalance(sender, config.formatMoney(receiverBalance), config.formatMoney(config.getMaxBalance()));
+            messagesFile.getVaultPayErrorMaxBalance()
+                    .tag(BALANCE_PATTERN, config.formatMoney(receiverBalance))
+                    .tag(MAX_BALANCE_PATTERN, config.formatMoney(config.getMaxBalance())).send(sender);
             return;
         }
-        storage.depositMoney(playerName.toLowerCase(), sum);
-        storage.withdrawMoney(playerSender.getName().toLowerCase(), sum);
-        val receiverNewBalance = config.formatMoney(storage.getPlayer(playerName.toLowerCase()).getMoney());
-        messagesFile.sendVaultPaySuccessful(sender, playerName, config.formatMoney(sum), config.formatMoney(storage.getPlayer(playerSender.getName().toLowerCase()).getMoney()));
-        messagesFile.sendVaultPayReceived(receiver, playerSender.getName(), config.formatMoney(sum), receiverNewBalance);
+        storage.depositMoney(playerNameLC, sum);
+        storage.withdrawMoney(senderLC, sum);
+        val receiverNewBalance = config.formatMoney(sum + receiverBalance);
+        messagesFile.getVaultPaySuccessful()
+                .tag(PLAYER_PATTERN, playerName)
+                .tag(MONEY_PATTERN, config.formatMoney(sum))
+                .tag(NEW_BALANCE_PATTERN, config.formatMoney(senderData.getMoney())).send(sender);
+        messagesFile.getVaultPayReceived()
+                .tag(PLAYER_PATTERN, playerSender.getName())
+                .tag(MONEY_PATTERN, config.formatMoney(sum))
+                .tag(NEW_BALANCE_PATTERN, receiverNewBalance).send(receiver);
     }
 }

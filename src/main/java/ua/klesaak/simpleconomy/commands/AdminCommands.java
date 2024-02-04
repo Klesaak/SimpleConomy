@@ -12,6 +12,8 @@ import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.*;
 
+import static ua.klesaak.simpleconomy.configurations.MessagesFile.*;
+
 public class AdminCommands extends AbstractBukkitCommand implements TabCompleter {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "delacc");
     private final SimpleEconomyManager manager;
@@ -55,7 +57,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.depositMoney(nickName, money);
-                messagesFile.sendVaultAddMoney(sender, nickName, config.formatMoney(money));
+                messagesFile.getVaultAddMoney().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
                 break;
             }
             case "addcoins": {
@@ -67,7 +69,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.depositCoins(nickName, coins);
-                messagesFile.sendCoinsAddMoney(sender, nickName, config.formatCoins(coins));
+                messagesFile.getCoinsAddMoney().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "setmoney": {
@@ -79,7 +81,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.setMoney(nickName, money);
-                messagesFile.sendVaultSetMoney(sender, nickName, config.formatMoney(money));
+                messagesFile.getVaultSetMoney().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
                 break;
             }
             case "setcoins": {
@@ -91,7 +93,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.setCoins(nickName, coins);
-                messagesFile.sendCoinsSetMoney(sender, nickName, config.formatCoins(coins));
+                messagesFile.getCoinsSetMoney().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "wmoney": {
@@ -103,7 +105,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.withdrawMoney(nickName, money);
-                messagesFile.sendVaultSenderWithdrawn(sender, nickName, config.formatMoney(money));
+                messagesFile.getVaultSenderWithdrawn().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, money).send(sender);
                 break;
             }
             case "wcoins": {
@@ -115,7 +117,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                     return;
                 }
                 storage.withdrawCoins(nickName, coins);
-                messagesFile.sendCoinsSenderWithdrawn(sender, nickName, config.formatCoins(coins));
+                messagesFile.getCoinsSenderWithdrawn().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "delacc": {

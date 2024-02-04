@@ -20,7 +20,7 @@ public interface SQLLoader {
     Pattern SPACE_PATTERN = Pattern.compile("\\s{2,}"); //фиксим большие пробелы
 
 
-    default String loadSQL(String name, String... placeholders) {
+    default String loadSQL(String name, Object... placeholders) {
         String sqlFile = "sql/" + name + ".sql";
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(sqlFile)) {
             if (inputStream == null) {
@@ -30,9 +30,9 @@ public interface SQLLoader {
                 String sqlLine = bufferedReader.lines().filter(line -> !line.trim().isEmpty() && !line.trim().startsWith("--")).collect(Collectors.joining(" "));
                 if (placeholders.length != 0 && placeholders.length % 2 == 0) {
                     int i = 0;
-                    for (String placeholder : placeholders) {
+                    for (Object placeholder : placeholders) {
                         if (i % 2 == 0) {
-                            sqlLine = sqlLine.replace(placeholder, placeholders[i + 1]);
+                            sqlLine = sqlLine.replace(String.valueOf(placeholder), String.valueOf(placeholders[i + 1]));
                         }
                         ++i;
                     }

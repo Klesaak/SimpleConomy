@@ -22,11 +22,9 @@ import ua.klesaak.simpleconomy.configurations.MessagesFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
-import ua.klesaak.simpleconomy.storage.sql.SQLStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
+import ua.klesaak.simpleconomy.storage.sql.SQLStorage;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
-
-import java.util.logging.Level;
 
 //todo нормальный reload
 //todo redis

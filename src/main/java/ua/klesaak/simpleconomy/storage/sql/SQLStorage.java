@@ -33,8 +33,8 @@ public class SQLStorage extends AbstractStorage implements SQLLoader {
         val sqlConfig = new SQLConfig(configFile.getSQLSection());
         this.createTableSql = this.loadSQL("createTables", "%tableName%", sqlConfig.getTable());
         this.fetchPlayerSql = this.loadSQL("fetch/fetchPlayer", "%tableName%", sqlConfig.getTable());
-        this.getMoneyTopSql = this.loadSQL("fetch/getMoneyTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopMoneyCount());
-        this.getCoinsTopSql = this.loadSQL("fetch/getCoinsTop", "%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopCoinsCount());
+        this.getMoneyTopSql = this.loadSQL("fetch/getMoneyTop", "%currency_column%", "money", "%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopMoneyCount());
+        this.getCoinsTopSql = this.loadSQL("fetch/getMoneyTop", "%currency_column%", "coins","%tableName%", sqlConfig.getTable(), "%countInTop%", configFile.getPlayerTopCoinsCount());
         this.deletePlayerSql = this.loadSQL("update/deletePlayer", "%tableName%", sqlConfig.getTable());
         this.insertPlayerSql = this.loadSQL("update/insertPlayer", "%tableName%", sqlConfig.getTable());
         AbstractConnectionFactory connectionFactory = new MySqlConnectionFactory(null, null, null, null, null, false);

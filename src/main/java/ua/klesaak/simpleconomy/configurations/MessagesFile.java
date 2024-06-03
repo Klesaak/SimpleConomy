@@ -70,9 +70,13 @@ public class MessagesFile extends PluginConfig {
     }
 
     public void sendCoinsTop(CommandSender sender, Collection<String> top) {
-        String topFormat = Joiner.on('\n').join(this.getStringList("coinsTop"));
+        sender.sendMessage(UtilityMethods.color(this.format(this.getStringList("coinsTop"), top)));
+    }
+
+    private String format(Collection<String> format, Collection<String> top) {
+        String topFormat = Joiner.on('\n').join(format);
         String topToString = Joiner.on('\n').join(top);
         topFormat = UtilityMethods.replaceAll(TOP_PATTERN, topFormat, ()-> topToString);
-        sender.sendMessage(UtilityMethods.color(topFormat));
+        return UtilityMethods.color(topFormat);
     }
 }

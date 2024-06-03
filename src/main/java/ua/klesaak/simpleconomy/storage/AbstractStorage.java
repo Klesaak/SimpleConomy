@@ -1,23 +1,17 @@
 package ua.klesaak.simpleconomy.storage;
 
-import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import ua.klesaak.simpleconomy.manager.TopManager;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractStorage implements AutoCloseable {
-    protected final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
     protected final SimpleEconomyManager manager;
 
     public AbstractStorage(SimpleEconomyManager manager) {
         this.manager = manager;
     }
 
-    public abstract void savePlayer(String nickName, PlayerData playerData);
-    public abstract void cachePlayer(String nickName);
-    public abstract void unCachePlayer(String nickName);
     public abstract boolean hasAccount(String nickName);
 
     //================VAULT================\\
@@ -35,12 +29,11 @@ public abstract class AbstractStorage implements AutoCloseable {
     public abstract boolean setCoins(String nickName, int amount);
     //================COINS================\\
     public abstract boolean createAccount(String nickName);
-    public abstract PlayerData getPlayer(String nickName);
 
-    public abstract void deleteAccount(String nickName);
+    public abstract void clearBalances(String nickName);
 
-    public abstract List<String> getMoneyTop(int amount);
-    public abstract List<String> getCoinsTop(int amount);
+    public abstract List<TopManager.TopLineDouble> getMoneyTop(int amount);
+    public abstract List<TopManager.TopLineInteger> getCoinsTop(int amount);
 
     @Override
     public abstract void close();

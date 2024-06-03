@@ -35,7 +35,7 @@ public class ConfigFile extends PluginConfig {
         this.startCoins = this.getInt("startCoins");
         this.minTransactionSum = this.getInt("minTransactionSum");
         this.isTopEnabled = this.getBoolean("playerTop.isEnabled");
-        this.playerTopMoneyCount = this.getInt("playerTop.moneyCount");
+        this.playerTopMoneyCount = this.getInt("playerTop.balanceCount");
         this.playerTopCoinsCount = this.getInt("playerTop.coinsCount");
         this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) * 20);
         this.topFormat = UtilityMethods.color(this.getString("playerTop.topFormat"));
@@ -48,20 +48,16 @@ public class ConfigFile extends PluginConfig {
         this.storageType = StorageType.parse(this.storage, StorageType.FILE);
     }
 
-    public String formatTopLine(String index, String player, String balance) {
+    public String formatTopLine(int index, String player, Object balance) {
         String format = this.topFormat;
-        format = UtilityMethods.replaceAll(MessagesFile.INDEX_PATTERN, format, ()-> index);
+        format = UtilityMethods.replaceAll(MessagesFile.INDEX_PATTERN, format, ()-> String.valueOf(index));
         format = UtilityMethods.replaceAll(MessagesFile.PLAYER_PATTERN, format, ()-> player);
-        format = UtilityMethods.replaceAll(MessagesFile.BALANCE_PATTERN, format, ()-> balance);
+        format = UtilityMethods.replaceAll(MessagesFile.BALANCE_PATTERN, format, ()-> String.valueOf(balance));
         return format;
     }
 
-    public ConfigurationSection getSQLSection() {
-        return this.getConfigurationSection("sql");
-    }
-
     public ConfigurationSection getRedisSection() {
-        return this.getConfigurationSection("redis");
+        return this.getConfigurationSection("jedis");
     }
 
     public String format(double amount) {

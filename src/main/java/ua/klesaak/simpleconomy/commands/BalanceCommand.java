@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.commands;
 
 import lombok.val;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
@@ -21,27 +20,28 @@ public class BalanceCommand extends AbstractBukkitCommand {
 
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
-        Player playerSender = this.cmdVerifyPlayer(sender);
         val configFile = manager.getConfigFile();
         val messagesFile = manager.getMessagesFile();
+        val storage = manager.getStorage();
         if (args.length == 0) {
-            val pd = manager.getStorage().getPlayer(playerSender.getName().toLowerCase());
+            Player playerSender = this.cmdVerifyPlayer(sender);
+            val senderNameLC = playerSender.getName().toLowerCase();
             messagesFile.getBalanceInfo()
-                    .tag(BALANCE_PATTERN, configFile.formatMoney(pd.getMoney()))
-                    .tag(COINS_PATTERN, configFile.formatCoins(pd.getCoins())).send(sender);
+                    .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(senderNameLC)))
+                    .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(senderNameLC))).send(sender);
             return;
         }
         if (args.length == 1 && sender.hasPermission("simpleconomy.others")) {
-            String name = args[0];
-            if (Bukkit.getPlayerExact(name) != null) {
-                val otherPD = manager.getStorage().getPlayer(name.toLowerCase());
+            String otherName = args[0];
+            String otherNameLC = otherName.toLowerCase();
+            if (storage.hasAccount(otherNameLC)) {
                 messagesFile.getBalanceInfoOther()
-                        .tag(BALANCE_PATTERN, configFile.formatMoney(otherPD.getMoney()))
-                        .tag(COINS_PATTERN, configFile.formatCoins(otherPD.getCoins()))
-                        .tag(PLAYER_PATTERN, name).send(sender);
+                        .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(otherNameLC)))
+                        .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(otherNameLC)))
+                        .tag(PLAYER_PATTERN, otherName).send(sender);
                 return;
             }
-            messagesFile.getPlayerNotFound().send(playerSender);
+            messagesFile.getPlayerNotFound().send(sender);
         }
     }
 }

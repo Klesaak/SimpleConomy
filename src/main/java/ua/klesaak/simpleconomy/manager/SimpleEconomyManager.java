@@ -5,11 +5,6 @@ import lombok.val;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.ServicePriority;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
 import ua.klesaak.simpleconomy.api.SimpleEconomyAPI;
@@ -23,14 +18,13 @@ import ua.klesaak.simpleconomy.papi.PAPIExpansion;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
-import ua.klesaak.simpleconomy.storage.sql.SQLStorage;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 //todo нормальный reload
 //todo redis
 
 @Getter
-public class SimpleEconomyManager implements Listener {
+public class SimpleEconomyManager {
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
@@ -45,7 +39,6 @@ public class SimpleEconomyManager implements Listener {
         }
         this.configFile = new ConfigFile(this.plugin);
         this.messagesFile = new MessagesFile(this.plugin);
-        this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
         this.initStorage();
         //================COMMANDS================\\
         new AdminCommands(this);
@@ -70,12 +63,6 @@ public class SimpleEconomyManager implements Listener {
                 this.storage = new JsonStorage(this);
                 break;
             }
-            case POSTGRESQL:
-            case MARIADB:
-            case MYSQL: {
-                this.storage = new SQLStorage(this);
-                break;
-            }
             case REDIS: {
                 this.storage = new RedisStorage(this);
                 break;
@@ -85,16 +72,6 @@ public class SimpleEconomyManager implements Listener {
             }
         }
         this.getPlugin().getLogger().info("Storage type loaded: " + storageType);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onJoin(PlayerJoinEvent event) {
-        this.storage.cachePlayer(event.getPlayer().getName().toLowerCase());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onLeave(PlayerQuitEvent event) {
-        this.storage.unCachePlayer(event.getPlayer().getName().toLowerCase());
     }
 
     public String reload() {
@@ -108,5 +85,6 @@ public class SimpleEconomyManager implements Listener {
         if (this.plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") && this.papiExpansion.isRegistered()) {
             this.papiExpansion.unregister();
         }
+        this.topManager.close();
     }
 }

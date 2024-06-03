@@ -1,1 +1,0 @@
-UPDATE %tableName% SET money = money - ? WHERE playerName = ? AND money >= ? LIMIT 1;

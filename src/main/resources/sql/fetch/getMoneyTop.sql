@@ -1,1 +1,0 @@
-SELECT playerName, %currency_column% FROM `%tableName%` ORDER BY %currency_column% DESC LIMIT %countInTop%;

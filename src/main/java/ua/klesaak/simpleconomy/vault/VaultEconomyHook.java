@@ -7,6 +7,7 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static ua.klesaak.simpleconomy.utils.UtilityMethods.getOfflinePlayer;
 
@@ -49,17 +50,17 @@ public class VaultEconomyHook implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return manager.getStorage().hasAccount(player.getName().toLowerCase());
+        return manager.getStorage().hasAccount(Objects.requireNonNull(player.getName()).toLowerCase());
     }
 
     @Override
     public double getBalance(OfflinePlayer player) {
-        return manager.getStorage().getMoneyBalance(player.getName().toLowerCase());
+        return manager.getStorage().getMoneyBalance(Objects.requireNonNull(player.getName()).toLowerCase());
     }
 
     @Override
     public boolean has(OfflinePlayer player, double amount) {
-        return manager.getStorage().hasMoney(player.getName().toLowerCase(), amount);
+        return manager.getStorage().hasMoney(Objects.requireNonNull(player.getName()).toLowerCase(), amount);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class VaultEconomyHook implements Economy {
         if (this.getBalance(player) - amount < 0)
             return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to withdraw");
 
-        return manager.getStorage().withdrawMoney(player.getName().toLowerCase(), amount)
+        return manager.getStorage().withdrawMoney(Objects.requireNonNull(player.getName()).toLowerCase(), amount)
                 ? new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, "Successful")
                 : new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to withdraw");
     }
@@ -76,14 +77,14 @@ public class VaultEconomyHook implements Economy {
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
         if (this.getBalance(player) + amount > this.manager.getConfigFile().getMaxBalance())
             new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to deposit");
-        return manager.getStorage().depositMoney(player.getName().toLowerCase(), amount)
+        return manager.getStorage().depositMoney(Objects.requireNonNull(player.getName()).toLowerCase(), amount)
                 ? new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, "Successful")
                 : new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to deposit");
     }
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        return manager.getStorage().createAccount(player.getName().toLowerCase());
+        return manager.getStorage().createAccount(Objects.requireNonNull(player.getName()).toLowerCase());
     }
 
     //region Expanded Methods

@@ -4,12 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum StorageType {
-    // Config file based
-    FILE("JSON", "json"),
-    REDIS("REDIS", "redis"),
-    MYSQL("MySQL", "mysql"),
-    POSTGRESQL("PostgresSQL", "postgresql"),
-    MARIADB("MariaDB", "mariadb");
+    FILE("JSON", "file"),
+    REDIS("REDIS", "jedis");
 
     private final String name;
 

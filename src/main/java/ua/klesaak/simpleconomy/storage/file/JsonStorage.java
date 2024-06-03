@@ -3,45 +3,33 @@ package ua.klesaak.simpleconomy.storage.file;
 import com.google.gson.reflect.TypeToken;
 import lombok.Synchronized;
 import lombok.val;
+import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import ua.klesaak.simpleconomy.manager.TopManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
-import ua.klesaak.simpleconomy.storage.PlayerData;
 import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JsonStorage extends AbstractStorage {
-    public static Type DATA_COLLECTION_TYPE = new TypeToken<Collection<PlayerData>>() {}.getType();
+    public static TypeToken<Collection<PlayerData>> DATA_COLLECTION_TYPE = new TypeToken<Collection<PlayerData>>() {};
+
+    private final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
     private final JsonData storage;
     public JsonStorage(SimpleEconomyManager manager) {
         super(manager);
         this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
         if (storage.getFile().length() > 0L) {
-            storage.readAll(new TypeToken<Collection<PlayerData>>() {}).forEach(playerData -> this.playersCache.put(playerData.getPlayerName(), playerData));
+            storage.readAll(DATA_COLLECTION_TYPE).forEach(playerData -> this.playersCache.put(playerData.getPlayerName(), playerData));
         }
     }
 
     @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), DATA_COLLECTION_TYPE));
-    }
-
-    @Override
-    public void savePlayer(String nickName, PlayerData playerData) {
-        this.save();
-    }
-
-    @Override
-    public void cachePlayer(String nickName) {
-        //empty
-    }
-
-    @Override
-    public void unCachePlayer(String nickName) {
-        //empty
+        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), DATA_COLLECTION_TYPE.getType()));
     }
 
     @Override
@@ -160,39 +148,35 @@ public class JsonStorage extends AbstractStorage {
     }
 
     @Override
-    public PlayerData getPlayer(String nickName) {
-        if (this.hasAccount(nickName)) {
-            return this.playersCache.get(nickName);
-        }
-        return new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
-    }
-
-    @Override
-    public void deleteAccount(String nickName) {
+    public void clearBalances(String nickName) {
         this.playersCache.remove(nickName);
         this.save();
     }
 
     @Override
-    public List<String> getMoneyTop(int amount) {
-        List<String> list = new ArrayList<>(128);
+    public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
         List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
         dataList.sort(Comparator.comparingDouble(PlayerData::getMoney).reversed());
-        for (val data : dataList) {
-            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getMoney())));
+        val data = new ArrayList<TopManager.TopLineDouble>(amount);
+        int dataListSize = dataList.size();
+        for (int i = 0; i < amount && dataListSize != i; i++) {
+            val pd = dataList.get(i);
+            data.add(new TopManager.TopLineDouble(pd.getPlayerName(), pd.getMoney(), i+1));
         }
-        return list;
+        return data;
     }
 
     @Override
-    public List<String> getCoinsTop(int amount) {
-        List<String> list = new ArrayList<>(128);
+    public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
         List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
-        dataList.sort(Comparator.comparingDouble(PlayerData::getCoins).reversed());
-        for (val data : dataList) {
-            list.add(this.manager.getConfigFile().formatTopLine(String.valueOf(list.size()+1), data.getPlayerName(), String.valueOf(data.getCoins())));
+        dataList.sort(Comparator.comparingInt(PlayerData::getCoins).reversed());
+        val data = new ArrayList<TopManager.TopLineInteger>(amount);
+        int dataListSize = dataList.size();
+        for (int i = 0; i < amount && dataListSize != i; i++) {
+            val pd = dataList.get(i);
+            data.add(new TopManager.TopLineInteger(pd.getPlayerName(), pd.getCoins(), i+1));
         }
-        return list;
+        return data;
     }
 
     @Override

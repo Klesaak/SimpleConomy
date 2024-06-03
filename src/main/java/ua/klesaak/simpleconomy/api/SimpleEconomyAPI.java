@@ -1,46 +1,60 @@
 package ua.klesaak.simpleconomy.api;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.storage.AbstractStorage;
 
 @UtilityClass
 public class SimpleEconomyAPI {
-    private AbstractStorage STORAGE;
+    private SimpleEconomyManager MANAGER;
 
     public void register(SimpleEconomyManager manager) {
-        STORAGE = manager.getStorage();
+        MANAGER = manager;
     }
 
     public double getMoneyBalance(String nickName) {
-        return STORAGE.getMoneyBalance(nickName.toLowerCase());
+        return MANAGER.getStorage().getMoneyBalance(nickName.toLowerCase());
     }
 
     public int getCoinsBalance(String nickName) {
-        return STORAGE.getCoinsBalance(nickName.toLowerCase());
+        return MANAGER.getStorage().getCoinsBalance(nickName.toLowerCase());
     }
 
     public boolean hasMoney(String nickName, double amount) {
-        return STORAGE.hasMoney(nickName.toLowerCase(), amount);
+        return MANAGER.getStorage().hasMoney(nickName.toLowerCase(), amount);
     }
 
     public boolean hasCoins(String nickName, int amount) {
-        return STORAGE.hasCoins(nickName.toLowerCase(), amount);
+        return MANAGER.getStorage().hasCoins(nickName.toLowerCase(), amount);
     }
 
     public void withdrawMoney(String nickName, double amount) {
-        STORAGE.withdrawMoney(nickName.toLowerCase(), amount);
+        String nickNameLC = nickName.toLowerCase();
+        double result = getMoneyBalance(nickNameLC) - amount;
+        if (result < 0) result = 0;
+        MANAGER.getStorage().withdrawMoney(nickNameLC, result);
     }
 
     public void depositMoney(String nickName, double amount) {
-        STORAGE.depositMoney(nickName.toLowerCase(), amount);
+        String nickNameLC = nickName.toLowerCase();
+        double result = getMoneyBalance(nickNameLC) + amount;
+        val maxBalance = MANAGER.getConfigFile().getMaxBalance();
+        if (result > maxBalance) result = maxBalance;
+        MANAGER.getStorage().depositMoney(nickNameLC, result);
     }
 
     public void withdrawCoins(String nickName, int amount) {
-        STORAGE.withdrawCoins(nickName.toLowerCase(), amount);
+        String nickNameLC = nickName.toLowerCase();
+        int result = getCoinsBalance(nickNameLC) - amount;
+        if (result < 0) result = 0;
+        MANAGER.getStorage().withdrawCoins(nickNameLC, result);
     }
 
     public void depositCoins(String nickName, int amount) {
-        STORAGE.depositCoins(nickName.toLowerCase(), amount);
+        String nickNameLC = nickName.toLowerCase();
+        int result = getCoinsBalance(nickNameLC) + amount;
+        val maxBalance = MANAGER.getConfigFile().getMaxCoins();
+        if (result > maxBalance) result = maxBalance;
+        MANAGER.getStorage().depositCoins(nickNameLC, result);
     }
 }

@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.storage;
+package ua.klesaak.simpleconomy.storage.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

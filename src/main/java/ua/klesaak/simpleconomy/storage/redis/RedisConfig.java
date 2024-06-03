@@ -10,7 +10,7 @@ import redis.clients.jedis.exceptions.JedisException;
 
 @Getter
 public class RedisConfig {
-    private final String address, password;
+    private final String address, password, balanceKey, coinsKey;
     private final int port, database;
 
     public RedisConfig(ConfigurationSection configurationSection) {
@@ -18,6 +18,8 @@ public class RedisConfig {
         this.port = configurationSection.getInt("port");
         this.database = configurationSection.getInt("database");
         this.password = configurationSection.getString("password");
+        this.balanceKey = configurationSection.getString("balanceKey");
+        this.coinsKey = configurationSection.getString("coinsKey");
     }
 
     public RedisPool newRedisPool() throws JedisException {

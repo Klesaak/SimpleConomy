@@ -1,1 +1,0 @@
-INSERT INTO %tableName% (playerName, money, coins) VALUES (?, GREATEST(?, 0), GREATEST(?, 0)) ON DUPLICATE KEY UPDATE playerName=?, money=GREATEST(?, 0), coins=GREATEST(?, 0);

@@ -1,25 +1,17 @@
-#Доступные хранилища: mysql, mariadb, postgresql, redis, file
+#Доступные хранилища: jedis, file
 storage: file
 
 #Будет ли функционировать команда /pay (актуально для серверов мини-игр)
 payCommandEnabled: true
 
-#Настройка mysql, mariadb, postgresql хранилища
-sql:
-  host: localhost
-  port: 3306
-  database: db
-  username: root
-  password: ""
-  table: "scon_surv"
-  useSSL: false
-
 #Настройка redis хранилища
-redis:
+jedis:
   host: 127.0.0.1
   port: 6379
   password: ""
   database: 0
+  balanceKey: "sc-balance-key"
+  coinsKey: "sc-coins-key"
 
 #Максимально допустимый баланс игрока
 maxBalance: 500000
@@ -37,7 +29,7 @@ playerTop:
   #Будет ли работать команда /baltop, обновления топа а так же плейсхолдеры в PAPI (актуально для серверов мини-игр)
   isEnabled: true
   #Кол-во игроков в топе по монеткам.
-  moneyCount: 10
+  balanceCount: 10
   #Кол-во игроков в топе по коинам.
   coinsCount: 10
   #Интервал обновления топов

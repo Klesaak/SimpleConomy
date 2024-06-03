@@ -30,7 +30,7 @@ public class PayCommand extends AbstractBukkitCommand {
         }
         val config = this.manager.getConfigFile();
         val storage = this.manager.getStorage();
-        val senderData = storage.getPlayer(senderLC);
+        val senderBalance = storage.getMoneyBalance(senderLC);
         val playerName = args[0];
         val playerNameLC = playerName.toLowerCase();
         int sum = 0;
@@ -48,9 +48,9 @@ public class PayCommand extends AbstractBukkitCommand {
             messagesFile.getPlayerNotFound().send(sender);
             return;
         }
-        val receiverBalance = storage.getPlayer(playerNameLC).getMoney();
-        if (senderData.getMoney() < sum) {
-            messagesFile.getVaultNoMoney().tag(BALANCE_PATTERN, config.formatMoney(senderData.getMoney())).send(sender);
+        val receiverBalance = storage.getMoneyBalance(playerNameLC);
+        if (senderBalance < sum) {
+            messagesFile.getVaultNoMoney().tag(BALANCE_PATTERN, config.formatMoney(senderBalance)).send(sender);
             return;
         }
         if (config.getMinTransactionSum() > sum) {
@@ -69,7 +69,7 @@ public class PayCommand extends AbstractBukkitCommand {
         messagesFile.getVaultPaySuccessful()
                 .tag(PLAYER_PATTERN, playerName)
                 .tag(MONEY_PATTERN, config.formatMoney(sum))
-                .tag(NEW_BALANCE_PATTERN, config.formatMoney(senderData.getMoney())).send(sender);
+                .tag(NEW_BALANCE_PATTERN, config.formatMoney(senderBalance)).send(sender);
         messagesFile.getVaultPayReceived()
                 .tag(PLAYER_PATTERN, playerSender.getName())
                 .tag(MONEY_PATTERN, config.formatMoney(sum))

@@ -71,7 +71,6 @@ public abstract class AbstractBukkitCommand implements CommandExecutor {
         }
     }
 
-    @Getter
     public static class AbstractCommandException extends RuntimeException {
         private final Message message;
 

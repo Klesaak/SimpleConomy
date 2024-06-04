@@ -133,9 +133,10 @@ public class RedisStorage extends AbstractStorage {
         Map<String, Double> map = new HashMap<>();
         try (Jedis jedis = this.redisPool.getRedis()) {
             jedis.select(this.redisConfig.getDatabase());
-            jedis.hgetAll(this.redisConfig.getBalanceKey());
+            jedis.hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> map.put(s, Double.parseDouble(s2)));
         }
         val dataList = new ArrayList<TopManager.TopLineDouble>();
+        //map.entrySet().stream().sorted(Map.Entry.comparingByValue()).limit(amount).collect(Collectors.toList()).forEach(entry -> dataList.add(new TopManager.TopLineDouble()));
         return dataList;
     }
 

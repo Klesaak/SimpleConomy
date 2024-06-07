@@ -36,6 +36,7 @@ coinsSenderWithdrawn:           "&6С игрока &c(player)&6 снято &c(co
 coinsAddMoney:                  "&6Вы успешно выдали игроку &b(player) (coins)&6."
 coinsSetMoney:                  "&6Вы успешно установили игроку &b(player) (coins)&6."
 
+topIsEmpty:                     "&cСписок пока пуст!"
 moneyTop:
   - "&cТоп богачей сервера."
   - "(top)"

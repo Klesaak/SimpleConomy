@@ -30,14 +30,14 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
         if (args.length == 0) {
             sender.sendMessage(ChatColor.GOLD + manager.getPlugin().getDescription().getName() + " v" + manager.getPlugin().getDescription().getVersion() + ChatColor.RED + " by Klesaak");
             sender.sendMessage("");
-            sender.sendMessage("§6/" + label + " reload - перезагрузить конфиги.");
-            sender.sendMessage("§6/" + label + " addmoney <ник> <сумма> - выдать деньги.");
-            sender.sendMessage("§6/" + label + " addcoins <ник> <сумма> - выдать коины.");
-            sender.sendMessage("§6/" + label + " wmoney <ник> <сумма> - забрать деньги.");
-            sender.sendMessage("§6/" + label + " wcoins <ник> <сумма> - забрать коины.");
-            sender.sendMessage("§6/" + label + " setmoney <ник> <сумма> - установить деньги.");
-            sender.sendMessage("§6/" + label + " setcoins <ник> <сумма> - установить коины.");
-            sender.sendMessage("§6/" + label + " clear <ник> - очистить балансы игроку.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " reload - перезагрузить конфиги.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " addmoney <ник> <сумма> - выдать деньги.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " addcoins <ник> <сумма> - выдать коины.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " wmoney <ник> <сумма> - забрать деньги.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " wcoins <ник> <сумма> - забрать коины.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " setmoney <ник> <сумма> - установить деньги.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " setcoins <ник> <сумма> - установить коины.");
+            sender.sendMessage(ChatColor.GOLD + "/" + label + " clear <ник> - очистить балансы игроку.");
             return;
         }
         val storage = this.manager.getStorage();
@@ -49,82 +49,94 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
                 break;
             }
             case "addmoney": {
-                this.cmdVerify(args.length != 3, "§6/" + label + " addmoney <ник> <сумма> - выдать деньги.");
+                this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " addmoney <ник> <сумма> - выдать деньги.");
                 val nickName = args[1].toLowerCase();
                 val money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) + money > config.getMaxBalance()) {
-                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
                 }
                 storage.depositMoney(nickName, money);
-                messagesFile.getVaultAddMoney().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
+                messagesFile.getVaultAddMoney()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
                 break;
             }
             case "addcoins": {
-                this.cmdVerify(args.length != 3, "§6/" + label + " addcoins <ник> <сумма> - выдать коины.");
+                this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " addcoins <ник> <сумма> - выдать коины.");
                 val nickName = args[1].toLowerCase();
                 val coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) + coins > config.getMaxCoins()) {
-                    sender.sendMessage("§cБаланс коинов превысит максимально допустимый.");
+                    sender.sendMessage(ChatColor.RED + "Баланс коинов превысит максимально допустимый.");
                     return;
                 }
                 storage.depositCoins(nickName, coins);
-                messagesFile.getCoinsAddMoney().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
+                messagesFile.getCoinsAddMoney()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "setmoney": {
-                this.cmdVerify(args.length != 3, "§6/" + label + " setmoney <ник> <сумма> - установить деньги.");
+                this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " setmoney <ник> <сумма> - установить деньги.");
                 val nickName = args[1].toLowerCase();
                 val money = this.cmdVerifyInt(args[2]);
                 if (money > config.getMaxBalance()) {
-                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
                 }
                 storage.setMoney(nickName, money);
-                messagesFile.getVaultSetMoney().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
+                messagesFile.getVaultSetMoney()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(MONEY_PATTERN, config.formatMoney(money)).send(sender);
                 break;
             }
             case "setcoins": {
-                this.cmdVerify(args.length != 3,"§6/" + label + " setcoins <ник> <сумма> - установить коины.");
+                this.cmdVerify(args.length != 3,ChatColor.GOLD + "/" + label + " setcoins <ник> <сумма> - установить коины.");
                 val nickName = args[1].toLowerCase();
                 val coins = this.cmdVerifyInt(args[2]);
                 if (coins > config.getMaxCoins()) {
-                    sender.sendMessage("§cБаланс игрока превысит максимально допустимый.");
+                    sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
                 }
                 storage.setCoins(nickName, coins);
-                messagesFile.getCoinsSetMoney().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
+                messagesFile.getCoinsSetMoney()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "wmoney": {
-                this.cmdVerify(args.length != 3, "§6/" + label + " wmoney <ник> <сумма> - забрать деньги.");
+                this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " wmoney <ник> <сумма> - забрать деньги.");
                 val nickName = args[1].toLowerCase();
                 val money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) - money < 0) {
-                    sender.sendMessage("§cБаланс игрока не может быть меньше ноля.");
+                    sender.sendMessage(ChatColor.RED + "Баланс игрока не может быть меньше ноля.");
                     return;
                 }
                 storage.withdrawMoney(nickName, money);
-                messagesFile.getVaultSenderWithdrawn().tag(PLAYER_PATTERN, nickName).tag(MONEY_PATTERN, money).send(sender);
+                messagesFile.getVaultSenderWithdrawn()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(MONEY_PATTERN, money).send(sender);
                 break;
             }
             case "wcoins": {
-                this.cmdVerify(args.length != 3,"§6/" + label + " wcoins <ник> <сумма> - забрать коины.");
+                this.cmdVerify(args.length != 3,ChatColor.GOLD + "/" + label + " wcoins <ник> <сумма> - забрать коины.");
                 val nickName = args[1].toLowerCase();
                 val coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) - coins < 0) {
-                    sender.sendMessage("§cБаланс коинов игрока не может быть меньше ноля.");
+                    sender.sendMessage(ChatColor.RED + "Баланс коинов игрока не может быть меньше ноля.");
                     return;
                 }
                 storage.withdrawCoins(nickName, coins);
-                messagesFile.getCoinsSenderWithdrawn().tag(PLAYER_PATTERN, nickName).tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
+                messagesFile.getCoinsSenderWithdrawn()
+                        .tag(PLAYER_PATTERN, nickName)
+                        .tag(COINS_PATTERN, config.formatCoins(coins)).send(sender);
                 break;
             }
             case "clear": {
-                this.cmdVerify(args.length != 2, "§6/" + label + " clear <ник> - очистить балансы игроку.");
+                this.cmdVerify(args.length != 2, ChatColor.GOLD + "/" + label + " clear <ник> - очистить балансы игроку.");
                 val nickName = args[1].toLowerCase();
                 storage.clearBalances(nickName);
-                sender.sendMessage("§6Балансы игрока " + nickName + " успешно сброшены.");
+                sender.sendMessage(ChatColor.GOLD + "Балансы игрока " + ChatColor.RED + nickName + ChatColor.GOLD +  " успешно сброшены.");
                 break;
             }
         }

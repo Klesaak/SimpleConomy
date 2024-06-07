@@ -3,6 +3,9 @@ package ua.klesaak.simpleconomy.api;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import ua.klesaak.simpleconomy.manager.TopManager;
+
+import java.util.List;
 
 @UtilityClass
 public class SimpleEconomyAPI {
@@ -56,5 +59,12 @@ public class SimpleEconomyAPI {
         val maxBalance = MANAGER.getConfigFile().getMaxCoins();
         if (result > maxBalance) result = maxBalance;
         MANAGER.getStorage().depositCoins(nickNameLC, result);
+    }
+
+    public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
+        return MANAGER.getStorage().getMoneyTop(amount);
+    }
+    public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
+        return MANAGER.getStorage().getCoinsTop(amount);
     }
 }

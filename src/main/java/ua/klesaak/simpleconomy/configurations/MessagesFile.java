@@ -26,6 +26,7 @@ public class MessagesFile extends PluginConfig {
     private final Message balanceInfo, balanceInfoOther, vaultPaySuccessful, vaultPayErrorMaxBalance, vaultNoMoney, vaultPayReceived, errorMinTransaction, vaultNoPlayerMoney, vaultPayUsage;
     private final Message vaultSenderWithdrawn, playerNotFound, notInteger, paySelf, vaultAddMoney, vaultSetMoney;
     private final Message coinsNoPlayerMoney, coinsSenderWithdrawn, coinsAddMoney, coinsSetMoney;
+    private final Message topIsEmpty;
 
 
     public MessagesFile(JavaPlugin plugin) {
@@ -49,6 +50,7 @@ public class MessagesFile extends PluginConfig {
         this.coinsSenderWithdrawn = new Message(this.getStringValue("coinsSenderWithdrawn"));
         this.coinsAddMoney = new Message(this.getStringValue("coinsAddMoney"));
         this.coinsSetMoney = new Message(this.getStringValue("coinsSetMoney"));
+        this.topIsEmpty = new Message(this.getStringValue("topIsEmpty"));
     }
 
     private String getStringValue(String key) {
@@ -63,10 +65,7 @@ public class MessagesFile extends PluginConfig {
 
     //tops
     public void sendMoneyTop(CommandSender sender, Collection<String> top) {
-        String topFormat = Joiner.on('\n').join(this.getStringList("moneyTop"));
-        String topToString = Joiner.on('\n').join(top);
-        topFormat = UtilityMethods.replaceAll(TOP_PATTERN, topFormat, ()-> topToString);
-        sender.sendMessage(UtilityMethods.color(topFormat));
+        sender.sendMessage(UtilityMethods.color(this.format(this.getStringList("moneyTop"), top)));
     }
 
     public void sendCoinsTop(CommandSender sender, Collection<String> top) {

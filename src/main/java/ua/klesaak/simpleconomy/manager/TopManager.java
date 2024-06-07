@@ -30,10 +30,16 @@ public class TopManager implements AutoCloseable {
         this.updateTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.manager.getPlugin(), ()-> {
             val storage = manager.getStorage();
             this.moneyTop = new ArrayList<>(moneyTopCount);
-            storage.getMoneyTop(moneyTopCount).forEach(topLineDouble -> this.moneyTop.add(this.manager.getConfigFile().formatTopLine(topLineDouble.getIndex(), topLineDouble.getNickName(), topLineDouble.getSum())));
+            val moneyTop = storage.getMoneyTop(moneyTopCount);
+            if (moneyTop.isEmpty()) {
+                this.moneyTop.add(manager.getMessagesFile().getTopIsEmpty().getMessage());
+            } else moneyTop.forEach(topLineDouble -> this.moneyTop.add(this.manager.getConfigFile().formatTopLine(topLineDouble.getIndex(), topLineDouble.getNickName(), topLineDouble.getSum())));
 
             this.coinsTop = new ArrayList<>();
-            storage.getCoinsTop(coinsTopCount).forEach(topLineInteger -> this.coinsTop.add(this.manager.getConfigFile().formatTopLine(topLineInteger.getIndex(), topLineInteger.getNickName(), topLineInteger.getSum())));
+            val coinsTop = storage.getCoinsTop(coinsTopCount);
+            if (coinsTop.isEmpty()) {
+                this.coinsTop.add(manager.getMessagesFile().getTopIsEmpty().getMessage());
+            } else coinsTop.forEach(topLineInteger -> this.coinsTop.add(this.manager.getConfigFile().formatTopLine(topLineInteger.getIndex(), topLineInteger.getNickName(), topLineInteger.getSum())));
 
         }, 20L, topUpdateInterval);
     }

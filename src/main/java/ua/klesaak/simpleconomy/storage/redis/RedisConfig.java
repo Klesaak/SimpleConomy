@@ -39,12 +39,12 @@ public class RedisConfig {
         }
 
         public Jedis getRedis() {
-            return pool.getResource();
+            return this.pool.getResource();
         }
 
         @Override
         public void close() {
-            pool.destroy();
+            if (this.pool != null) this.pool.destroy();
         }
     }
 }

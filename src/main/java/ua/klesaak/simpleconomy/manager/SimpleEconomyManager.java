@@ -20,9 +20,6 @@ import ua.klesaak.simpleconomy.storage.file.JsonStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
-//todo нормальный reload
-//todo redis
-
 @Getter
 public class SimpleEconomyManager {
     private final SimpleConomyPlugin plugin;
@@ -77,6 +74,8 @@ public class SimpleEconomyManager {
     public String reload() {
         this.configFile = new ConfigFile(this.plugin);
         this.messagesFile = new MessagesFile(this.plugin);
+        this.storage.close();
+        this.initStorage();
         return ChatColor.GREEN + this.getPlugin().getDescription().getName() + " reloaded!";
     }
 

@@ -54,7 +54,9 @@ public class PayCommand extends AbstractBukkitCommand {
             return;
         }
         if (config.getMinTransactionSum() > sum) {
-            messagesFile.getErrorMinTransaction().tag(SUM_PATTERN, config.getMinTransactionSum()).tag(MONEY_PATTERN, sum).send(sender);
+            messagesFile.getErrorMinTransaction()
+                    .tag(SUM_PATTERN, config.formatMoney(config.getMinTransactionSum()))
+                    .tag(MONEY_PATTERN, config.formatMoney(sum)).send(sender);
             return;
         }
         if (receiverBalance + sum > config.getMaxBalance()) {
@@ -66,10 +68,11 @@ public class PayCommand extends AbstractBukkitCommand {
         storage.depositMoney(playerNameLC, sum);
         storage.withdrawMoney(senderLC, sum);
         val receiverNewBalance = config.formatMoney(sum + receiverBalance);
+        val newSenderBalance = senderBalance - sum;
         messagesFile.getVaultPaySuccessful()
                 .tag(PLAYER_PATTERN, playerName)
                 .tag(MONEY_PATTERN, config.formatMoney(sum))
-                .tag(NEW_BALANCE_PATTERN, config.formatMoney(senderBalance)).send(sender);
+                .tag(NEW_BALANCE_PATTERN, config.formatMoney(newSenderBalance)).send(sender);
         messagesFile.getVaultPayReceived()
                 .tag(PLAYER_PATTERN, playerSender.getName())
                 .tag(MONEY_PATTERN, config.formatMoney(sum))

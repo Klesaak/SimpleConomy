@@ -17,10 +17,6 @@ import java.util.regex.Pattern;
 @UtilityClass
 public class UtilityMethods {
 
-    public String color(String path) {
-        return ChatColor.translateAlternateColorCodes('&', path);
-    }
-
     /**
      * Equivalent to {@link String#replace(CharSequence, CharSequence)}, but uses a
      * {@link Supplier} for the replacement.

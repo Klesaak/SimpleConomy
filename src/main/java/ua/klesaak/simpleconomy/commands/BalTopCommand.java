@@ -24,19 +24,18 @@ public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter
 
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
-        val messagesFile = this.manager.getMessagesFile();
         val topManager = this.manager.getTopManager();
         if (args.length == 0) {
-            messagesFile.sendMoneyTop(sender, topManager.getMoneyTop());
+            sender.sendMessage(topManager.getMoneyTop());
             return;
         }
         switch (args[0]) {
             case "money": {
-                messagesFile.sendMoneyTop(sender, topManager.getMoneyTop());
+                sender.sendMessage(topManager.getMoneyTop());
                 break;
             }
             case "coins": {
-                messagesFile.sendCoinsTop(sender, topManager.getCoinsTop());
+                sender.sendMessage(topManager.getCoinsTop());
                 break;
             }
         }

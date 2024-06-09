@@ -30,13 +30,13 @@ paySelf:                        "&6Вы &cне можете&6 перевести
 vaultAddMoney:                  "&6Вы успешно выдали &c(player)&e (money) &6."
 vaultSetMoney:                  "&6Вы успешно установили &c(player)&e (money) &6."
 
-#Настройка сообщений команды /coins
 coinsNoPlayerMoney:             "&6У игрока &cне достаточно&6 средств."
 coinsSenderWithdrawn:           "&6С игрока &c(player)&6 снято &c(coins)&6."
 coinsAddMoney:                  "&6Вы успешно выдали игроку &b(player) (coins)&6."
 coinsSetMoney:                  "&6Вы успешно установили игроку &b(player) (coins)&6."
 
-topIsEmpty:                     "&cСписок пока пуст!"
+moneyTopIsEmpty:                "&cСписок крестьян пока пуст!"
+coinsTopIsEmpty:                "&cСписок евреев пока пуст!"
 moneyTop:
   - "&cТоп богачей сервера."
   - "(top)"

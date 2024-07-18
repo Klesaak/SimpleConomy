@@ -1,6 +1,5 @@
 package ua.klesaak.simpleconomy.utils;
 
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

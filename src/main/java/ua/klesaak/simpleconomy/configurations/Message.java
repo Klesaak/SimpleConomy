@@ -8,8 +8,8 @@ import ua.klesaak.simpleconomy.utils.UtilityMethods;
 import java.util.regex.Pattern;
 
 @Getter
-public final class Message {
-    private final String message;
+public class Message {
+    protected String message;
 
     public Message(String message) {
         this.message = message;
@@ -28,25 +28,16 @@ public final class Message {
         Bukkit.getConsoleSender().sendMessage(this.message);
     }
 
-    public static class TagMessage {
-        private String message;
+    public static class TagMessage extends Message {
 
         public TagMessage(String message) {
-            this.message = message;
+            super(message);
         }
 
+        @Override
         public TagMessage tag(Pattern pattern, Object replacement) {
             this.message = UtilityMethods.replaceAll(pattern, this.message, ()-> String.valueOf(replacement));
             return this;
-        }
-
-        public void send(CommandSender sender) {
-            sender.sendMessage(this.message);
-        }
-
-        public void broadcast() {
-            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(this.message));
-            Bukkit.getConsoleSender().sendMessage(this.message);
         }
     }
 }

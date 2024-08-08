@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.storage.StorageType;
 import ua.klesaak.simpleconomy.utils.MCColorUtils;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
-import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,6 +24,8 @@ public class ConfigFile extends PluginConfig {
     private final boolean payCommandEnabled;
     private final String currencyFormatPlural, currencyFormatSingular, currencyFormatPlural2, currencyCoinsFormatPlural, currencyCoinsFormatSingular, currencyCoinsFormatPlural2;
     private final StorageType storageType;
+
+    private final DecimalFormat format = new DecimalFormat();
 
     public ConfigFile(JavaPlugin plugin) {
         super(plugin, "config.yml");
@@ -47,6 +48,15 @@ public class ConfigFile extends PluginConfig {
         this.currencyCoinsFormatSingular = this.getString("currencyCoinsFormat.singular");
         this.currencyCoinsFormatPlural2 = this.getString("currencyCoinsFormat.plural2");
         this.storageType = StorageType.parse(this.storage, StorageType.FILE);
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
+        this.format.setRoundingMode(RoundingMode.HALF_EVEN);
+        this.format.setGroupingUsed(true);
+        this.format.setMinimumFractionDigits(0);
+        this.format.setMaximumFractionDigits(2);
+        this.format.setDecimalFormatSymbols(symbols);
     }
 
     public ConfigurationSection getRedisSection() {
@@ -54,20 +64,7 @@ public class ConfigFile extends PluginConfig {
     }
 
     public String format(double amount) {
-        return format(BigDecimal.valueOf(amount));
-    }
-
-    private String format(BigDecimal amount) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setDecimalSeparator('.');
-        symbols.setGroupingSeparator(',');
-        DecimalFormat format = new DecimalFormat();
-        format.setRoundingMode(RoundingMode.HALF_EVEN);
-        format.setGroupingUsed(true);
-        format.setMinimumFractionDigits(0);
-        format.setMaximumFractionDigits(2);
-        format.setDecimalFormatSymbols(symbols);
-        return format.format(amount);
+        return this.format.format(BigDecimal.valueOf(amount));
     }
 
     public String formatMoney(double amount) {

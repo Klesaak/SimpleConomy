@@ -137,19 +137,11 @@ public class NumberUtils {
         if (number % 100 > 10 && number % 100 < 15) {
             return number + " " + other;
         }
-        switch (number % 10) {
-            case 1: {
-                return number + " " + single;
-            }
-            case 2:
-            case 3:
-            case 4: {
-                return number + " " + second;
-            }
-            default: {
-                return number + " " + other;
-            }
-        }
+        return switch (number % 10) {
+            case 1 -> number + " " + single;
+            case 2, 3, 4 -> number + " " + second;
+            default -> number + " " + other;
+        };
     }
 
 
@@ -166,19 +158,11 @@ public class NumberUtils {
         if (number % 100 > 10 && number % 100 < 15) {
             return spaced(number) + " " + other;
         }
-        switch (number % 10) {
-            case 1: {
-                return spaced(number) + " " + single;
-            }
-            case 2:
-            case 3:
-            case 4: {
-                return spaced(number) + " " + second;
-            }
-            default: {
-                return spaced(number) + " " + other;
-            }
-        }
+        return switch (number % 10) {
+            case 1 -> spaced(number) + " " + single;
+            case 2, 3, 4 -> spaced(number) + " " + second;
+            default -> spaced(number) + " " + other;
+        };
     }
 
     /**

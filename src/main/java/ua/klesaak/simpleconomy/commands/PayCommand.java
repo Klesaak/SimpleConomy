@@ -22,7 +22,7 @@ public class PayCommand extends AbstractBukkitCommand {
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
-        String senderLC = playerSender.getName().toLowerCase();
+        String senderNameLC = playerSender.getName().toLowerCase();
         var messagesFile = this.manager.getMessagesFile();
         if (args.length != 2) {
             messagesFile.getVaultPayUsage().tag(LABEL_PATTERN, label).send(sender);
@@ -30,7 +30,7 @@ public class PayCommand extends AbstractBukkitCommand {
         }
         var config = this.manager.getConfigFile();
         var storage = this.manager.getStorage();
-        var senderBalance = storage.getMoneyBalance(senderLC);
+        var senderBalance = storage.getMoneyBalance(senderNameLC);
         var playerName = args[0];
         var playerNameLC = playerName.toLowerCase();
         int sum = 0;
@@ -66,7 +66,7 @@ public class PayCommand extends AbstractBukkitCommand {
             return;
         }
         storage.depositMoney(playerNameLC, sum);
-        storage.withdrawMoney(senderLC, sum);
+        storage.withdrawMoney(senderNameLC, sum);
         var receiverNewBalance = config.formatMoney(sum + receiverBalance);
         var newSenderBalance = senderBalance - sum;
         messagesFile.getVaultPaySuccessful()

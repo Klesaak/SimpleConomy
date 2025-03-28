@@ -3,7 +3,6 @@ package ua.klesaak.simpleconomy.configurations;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import ua.klesaak.simpleconomy.utils.MCColorUtils;
 
 import java.util.regex.Pattern;
 
@@ -60,8 +59,8 @@ public class MessagesFile extends PluginConfig {
         if (this.isString(key)) {
             message = this.getString(key);
         } else if (this.isList(key)) {
-            message = Joiner.on('\n').join(this.getStringList(key));
+            message = Joiner.on("<br>").join(this.getStringList(key));
         }
-        return MCColorUtils.color(message);
+        return message;
     }
 }

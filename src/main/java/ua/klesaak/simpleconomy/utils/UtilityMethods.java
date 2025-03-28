@@ -3,7 +3,6 @@ package ua.klesaak.simpleconomy.utils;
 import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 

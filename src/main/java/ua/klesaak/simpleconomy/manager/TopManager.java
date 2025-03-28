@@ -34,7 +34,7 @@ public class TopManager implements AutoCloseable {
             val storage = this.manager.getStorage();
             val messagesFile = this.manager.getMessagesFile();
             val configFile = this.manager.getConfigFile();
-            this.moneyTop = messagesFile.getMoneyTopIsEmpty().getMessage();
+            this.moneyTop = messagesFile.getMoneyTopIsEmpty().getMiniMessage();
             val moneyTop = storage.getMoneyTop(moneyTopCount);
             if (!moneyTop.isEmpty()) {
                 val list = new ArrayList<String>(moneyTopCount);
@@ -42,7 +42,7 @@ public class TopManager implements AutoCloseable {
                 this.moneyTop = this.format(messagesFile.getMoneyTopFormat(), list);
             }
 
-            this.coinsTop = messagesFile.getCoinsTopIsEmpty().getMessage();
+            this.coinsTop = messagesFile.getCoinsTopIsEmpty().getMiniMessage();
             val coinsTop = storage.getCoinsTop(coinsTopCount);
             if (!coinsTop.isEmpty()) {
                 val list = new ArrayList<String>(coinsTopCount);

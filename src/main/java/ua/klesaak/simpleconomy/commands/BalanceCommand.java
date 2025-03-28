@@ -20,12 +20,12 @@ public class BalanceCommand extends AbstractBukkitCommand {
 
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
-        val configFile = manager.getConfigFile();
-        val messagesFile = manager.getMessagesFile();
-        val storage = manager.getStorage();
+        var configFile = manager.getConfigFile();
+        var messagesFile = manager.getMessagesFile();
+        var storage = manager.getStorage();
         if (args.length == 0) {
             Player playerSender = this.cmdVerifyPlayer(sender);
-            val senderNameLC = playerSender.getName().toLowerCase();
+            var senderNameLC = playerSender.getName().toLowerCase();
             messagesFile.getBalanceInfo()
                     .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(senderNameLC)))
                     .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(senderNameLC))).send(sender);

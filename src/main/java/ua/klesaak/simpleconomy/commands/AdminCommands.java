@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.commands;
 
 import lombok.NonNull;
-import lombok.val;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -40,9 +39,9 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             sender.sendMessage(ChatColor.GOLD + "/" + label + " clear <ник> - очистить балансы игроку.");
             return;
         }
-        val storage = this.manager.getStorage();
-        val config = this.manager.getConfigFile();
-        val messagesFile = this.manager.getMessagesFile();
+        var storage = this.manager.getStorage();
+        var config = this.manager.getConfigFile();
+        var messagesFile = this.manager.getMessagesFile();
         switch (args[0].toLowerCase()) {
             case "reload": {
                 sender.sendMessage(this.manager.reload());
@@ -50,8 +49,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "addmoney": {
                 this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " addmoney <ник> <сумма> - выдать деньги.");
-                val nickName = args[1].toLowerCase();
-                val money = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) + money > config.getMaxBalance()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
@@ -64,8 +63,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "addcoins": {
                 this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " addcoins <ник> <сумма> - выдать коины.");
-                val nickName = args[1].toLowerCase();
-                val coins = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) + coins > config.getMaxCoins()) {
                     sender.sendMessage(ChatColor.RED + "Баланс коинов превысит максимально допустимый.");
                     return;
@@ -78,8 +77,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "setmoney": {
                 this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " setmoney <ник> <сумма> - установить деньги.");
-                val nickName = args[1].toLowerCase();
-                val money = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var money = this.cmdVerifyInt(args[2]);
                 if (money > config.getMaxBalance()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
@@ -92,8 +91,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "setcoins": {
                 this.cmdVerify(args.length != 3,ChatColor.GOLD + "/" + label + " setcoins <ник> <сумма> - установить коины.");
-                val nickName = args[1].toLowerCase();
-                val coins = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var coins = this.cmdVerifyInt(args[2]);
                 if (coins > config.getMaxCoins()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
                     return;
@@ -106,8 +105,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "wmoney": {
                 this.cmdVerify(args.length != 3, ChatColor.GOLD + "/" + label + " wmoney <ник> <сумма> - забрать деньги.");
-                val nickName = args[1].toLowerCase();
-                val money = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) - money < 0) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока не может быть меньше ноля.");
                     return;
@@ -120,8 +119,8 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "wcoins": {
                 this.cmdVerify(args.length != 3,ChatColor.GOLD + "/" + label + " wcoins <ник> <сумма> - забрать коины.");
-                val nickName = args[1].toLowerCase();
-                val coins = this.cmdVerifyInt(args[2]);
+                var nickName = args[1].toLowerCase();
+                var coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) - coins < 0) {
                     sender.sendMessage(ChatColor.RED + "Баланс коинов игрока не может быть меньше ноля.");
                     return;
@@ -134,7 +133,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
             }
             case "clear": {
                 this.cmdVerify(args.length != 2, ChatColor.GOLD + "/" + label + " clear <ник> - очистить балансы игроку.");
-                val nickName = args[1].toLowerCase();
+                var nickName = args[1].toLowerCase();
                 storage.clearBalances(nickName);
                 sender.sendMessage(ChatColor.GOLD + "Балансы игрока " + ChatColor.RED + nickName + ChatColor.GOLD +  " успешно сброшены.");
                 break;

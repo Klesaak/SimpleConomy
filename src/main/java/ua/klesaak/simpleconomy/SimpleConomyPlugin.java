@@ -4,7 +4,6 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
-import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.LoadBefore;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;

@@ -8,12 +8,11 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
-import java.lang.reflect.Type;
 
 @Getter
 public class JsonData {
@@ -53,13 +52,13 @@ public class JsonData {
     @SneakyThrows
     public <T> void write(T source, boolean needTypeToken) {
         String json = needTypeToken ? GSON.toJson(source, new TypeToken<T>(){}.getType()) : GSON.toJson(source);
-        Files.write(this.file.toPath(), json.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.writeString(this.file.toPath(), json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @SneakyThrows
     public <T> void write(T source, Type typeToken) {
         String json = GSON.toJson(source, typeToken);
-        Files.write(this.file.toPath(), json.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.writeString(this.file.toPath(), json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @Getter

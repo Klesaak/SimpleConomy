@@ -1,6 +1,5 @@
 package ua.klesaak.simpleconomy.commands;
 
-import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,16 +22,16 @@ public class PayCommand extends AbstractBukkitCommand {
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
         String senderLC = playerSender.getName().toLowerCase();
-        val messagesFile = this.manager.getMessagesFile();
+        var messagesFile = this.manager.getMessagesFile();
         if (args.length != 2) {
             messagesFile.getVaultPayUsage().tag(LABEL_PATTERN, label).send(sender);
             return;
         }
-        val config = this.manager.getConfigFile();
-        val storage = this.manager.getStorage();
-        val senderBalance = storage.getMoneyBalance(senderLC);
-        val playerName = args[0];
-        val playerNameLC = playerName.toLowerCase();
+        var config = this.manager.getConfigFile();
+        var storage = this.manager.getStorage();
+        var senderBalance = storage.getMoneyBalance(senderLC);
+        var playerName = args[0];
+        var playerNameLC = playerName.toLowerCase();
         int sum = 0;
         try {
             sum = Integer.parseInt(args[1]);
@@ -43,12 +42,12 @@ public class PayCommand extends AbstractBukkitCommand {
             messagesFile.getPaySelf().send(sender);
             return;
         }
-        val receiver = Bukkit.getPlayerExact(playerName);
+        var receiver = Bukkit.getPlayerExact(playerName);
         if (receiver == null) {
             messagesFile.getPlayerNotFound().send(sender);
             return;
         }
-        val receiverBalance = storage.getMoneyBalance(playerNameLC);
+        var receiverBalance = storage.getMoneyBalance(playerNameLC);
         if (senderBalance < sum) {
             messagesFile.getVaultNoMoney().tag(BALANCE_PATTERN, config.formatMoney(senderBalance)).send(sender);
             return;
@@ -67,8 +66,8 @@ public class PayCommand extends AbstractBukkitCommand {
         }
         storage.depositMoney(playerNameLC, sum);
         storage.withdrawMoney(senderLC, sum);
-        val receiverNewBalance = config.formatMoney(sum + receiverBalance);
-        val newSenderBalance = senderBalance - sum;
+        var receiverNewBalance = config.formatMoney(sum + receiverBalance);
+        var newSenderBalance = senderBalance - sum;
         messagesFile.getVaultPaySuccessful()
                 .tag(PLAYER_PATTERN, playerName)
                 .tag(MONEY_PATTERN, config.formatMoney(sum))

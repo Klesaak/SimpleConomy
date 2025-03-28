@@ -21,7 +21,7 @@ public class MCColorUtils {
         char colorChar = ChatColor.COLOR_CHAR;
 
         Matcher matcher = hexPattern.matcher(text);
-        StringBuffer buffer = new StringBuffer(text.length() + 4 * 8);
+        StringBuilder buffer = new StringBuilder(text.length() + 4 * 8);
 
         while (matcher.find()) {
             String group = matcher.group(1);

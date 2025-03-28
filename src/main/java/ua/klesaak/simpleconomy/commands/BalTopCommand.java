@@ -24,7 +24,7 @@ public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter
 
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
-        val topManager = this.manager.getTopManager();
+        var topManager = this.manager.getTopManager();
         if (args.length == 0) {
             sender.sendMessage(topManager.getMoneyTop());
             return;

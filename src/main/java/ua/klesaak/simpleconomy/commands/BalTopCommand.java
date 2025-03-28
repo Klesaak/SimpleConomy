@@ -11,14 +11,13 @@ import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.*;
 
-public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter {
+public class BalTopCommand extends AbstractBukkitCommand {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("money", "coins");
     private final SimpleEconomyManager manager;
 
     public BalTopCommand(SimpleEconomyManager manager) {
+        super(manager.getPlugin(), "baltop");
         this.manager = manager;
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("baltop")).setExecutor(this);
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("baltop")).setTabCompleter(this);
     }
 
 
@@ -42,7 +41,7 @@ public class BalTopCommand extends AbstractBukkitCommand implements TabCompleter
     }
 
     @Override
-    public List<String> onTabComplete(@NonNull CommandSender commandSender, @NonNull Command command, @NonNull String label, String[] args) {
+    public List<String> onTabSuggest(CommandSender sender, String[] args) {
         if (args.length == 1) {
             return UtilityMethods.copyPartialMatches(args[0].toLowerCase(), SUB_COMMANDS0, new ArrayList<>());
         }

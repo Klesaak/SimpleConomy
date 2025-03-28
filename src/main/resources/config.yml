@@ -1,3 +1,9 @@
+#PlaceholderAPI:
+# sc_coins - кол-во коинов игрока.
+# sc_money - кол-во денег игрока.
+# sc_coins_formatted - кол-во коинов игрока в отформатированном виде (см. ниже plural, singular, plural2).
+# sc_money_formatted - кол-во денег игрока в отформатированном виде (см. ниже plural, singular, plural2).
+
 #Доступные хранилища: jedis, file
 storage: file
 
@@ -21,7 +27,7 @@ maxCoins: 100000
 startBalance: 100
 startCoins: 10
 
-#Минимальная сума денег которую игрок может перевести через /pay
+#Минимальная сумма денег которую игрок может перевести через /pay
 minTransactionSum: 100
 
 #Настройки топа.

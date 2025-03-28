@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
 import lombok.Getter;
-import lombok.val;
 import org.bukkit.configuration.ConfigurationSection;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -30,7 +29,7 @@ public class RedisConfig {
         private final JedisPool pool;
 
         public RedisPool(String host, int port, String pass) {
-            val jpc = new JedisPoolConfig();
+            var jpc = new JedisPoolConfig();
             jpc.setLifo(false);
             jpc.setTestOnBorrow(true);
             jpc.setMinIdle(3);

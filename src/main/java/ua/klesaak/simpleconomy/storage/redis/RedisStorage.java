@@ -1,6 +1,5 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
-import lombok.val;
 import redis.clients.jedis.Jedis;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
@@ -149,12 +148,12 @@ public class RedisStorage extends AbstractStorage {
             jedis.select(this.redisConfig.getDatabase());
             jedis.hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> map.put(s, Double.parseDouble(s2)));
         }
-        val dataList = new ArrayList<TopManager.TopLineDouble>();
-        val sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        var dataList = new ArrayList<TopManager.TopLineDouble>();
+        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
         Collections.reverse(sortedList);
         int sortedListSize = sortedList.size();
         for (int i = 0; i < amount && sortedListSize != i; i++) {
-            val entry = sortedList.get(i);
+            var entry = sortedList.get(i);
             dataList.add(new TopManager.TopLineDouble(entry.getKey(), entry.getValue(), i+1));
         }
         return dataList;
@@ -167,12 +166,12 @@ public class RedisStorage extends AbstractStorage {
             jedis.select(this.redisConfig.getDatabase());
             jedis.hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> map.put(s, Integer.parseInt(s2)));
         }
-        val dataList = new ArrayList<TopManager.TopLineInteger>();
-        val sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        var dataList = new ArrayList<TopManager.TopLineInteger>();
+        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
         Collections.reverse(sortedList);
         int sortedListSize = sortedList.size();
         for (int i = 0; i < amount && sortedListSize != i; i++) {
-            val entry = sortedList.get(i);
+            var entry = sortedList.get(i);
             dataList.add(new TopManager.TopLineInteger(entry.getKey(), entry.getValue(), i+1));
         }
         return dataList;

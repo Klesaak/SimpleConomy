@@ -1,12 +1,12 @@
 package ua.klesaak.simpleconomy.commands;
 
-import lombok.val;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
 
 import static ua.klesaak.simpleconomy.configurations.MessagesFile.*;
 
@@ -14,8 +14,8 @@ public class BalanceCommand extends AbstractBukkitCommand {
     private final SimpleEconomyManager manager;
 
     public BalanceCommand(SimpleEconomyManager manager) {
+        super(manager.getPlugin(), "balance");
         this.manager = manager;
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("balance")).setExecutor(this);
     }
 
     @Override
@@ -43,5 +43,10 @@ public class BalanceCommand extends AbstractBukkitCommand {
             }
             messagesFile.getPlayerNotFound().send(sender);
         }
+    }
+
+    @Override
+    public List<String> onTabSuggest(CommandSender sender, String[] args) {
+        return Collections.emptyList();
     }
 }

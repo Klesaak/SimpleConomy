@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
 
 import static ua.klesaak.simpleconomy.configurations.MessagesFile.*;
 
@@ -14,8 +15,8 @@ public class PayCommand extends AbstractBukkitCommand {
     private final SimpleEconomyManager manager;
 
     public PayCommand(SimpleEconomyManager manager) {
+        super(manager.getPlugin(), "pay");
         this.manager = manager;
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("pay")).setExecutor(this);
     }
 
     @Override
@@ -76,5 +77,10 @@ public class PayCommand extends AbstractBukkitCommand {
                 .tag(PLAYER_PATTERN, playerSender.getName())
                 .tag(MONEY_PATTERN, config.formatMoney(sum))
                 .tag(NEW_BALANCE_PATTERN, receiverNewBalance).send(receiver);
+    }
+
+    @Override
+    public List<String> onTabSuggest(CommandSender sender, String[] args) {
+        return Collections.emptyList();
     }
 }

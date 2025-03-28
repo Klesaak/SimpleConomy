@@ -2,7 +2,6 @@ package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
 import lombok.Synchronized;
-import lombok.val;
 import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
@@ -13,23 +12,24 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class JsonStorage extends AbstractStorage {
-    public static TypeToken<Collection<PlayerData>> DATA_COLLECTION_TYPE = new TypeToken<Collection<PlayerData>>() {};
+    public static TypeToken<Map<String, PlayerData>> DATA_COLLECTION_TYPE = new TypeToken<>() {};
 
     private final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
-    private final JsonData storage;
+    private final JsonData storageFile;
     public JsonStorage(SimpleEconomyManager manager) {
         super(manager);
-        this.storage = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
-        if (storage.getFile().length() > 0L) {
-            storage.readAll(DATA_COLLECTION_TYPE).forEach(playerData -> this.playersCache.put(playerData.getPlayerName(), playerData));
+        this.storageFile = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
+        if (storageFile.getFile().length() > 0L) {
+            this.playersCache.putAll(storageFile.readAll(DATA_COLLECTION_TYPE));
         }
     }
 
     @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storage.write(this.playersCache.values(), DATA_COLLECTION_TYPE.getType()));
+        CompletableFuture.runAsync(() -> this.storageFile.write(this.playersCache, DATA_COLLECTION_TYPE.getType()));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        var playerData =  new PlayerData(manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
         playerData.withdrawMoney(amount);
         this.playersCache.put(nickName, playerData);
         this.save();
@@ -70,7 +70,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        var playerData =  new PlayerData(manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
         playerData.depositMoney(amount);
         this.playersCache.put(nickName, playerData);
         this.save();
@@ -84,7 +84,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        this.playersCache.put(nickName, new PlayerData(nickName, amount, manager.getConfigFile().getStartCoins()));
+        this.playersCache.put(nickName, new PlayerData(amount, manager.getConfigFile().getStartCoins()));
         this.save();
         return true;
     }
@@ -108,7 +108,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        var playerData =  new PlayerData(manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
         playerData.withdrawCoins(amount);
         this.playersCache.put(nickName, playerData);
         this.save();
@@ -122,7 +122,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        val playerData =  new PlayerData(nickName, manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
+        var playerData =  new PlayerData(manager.getConfigFile().getStartBalance(), manager.getConfigFile().getStartCoins());
         playerData.depositCoins(amount);
         this.playersCache.put(nickName, playerData);
         this.save();
@@ -136,7 +136,7 @@ public class JsonStorage extends AbstractStorage {
             this.save();
             return true;
         }
-        this.playersCache.put(nickName, new PlayerData(nickName, manager.getConfigFile().getStartBalance(), amount));
+        this.playersCache.put(nickName, new PlayerData(manager.getConfigFile().getStartBalance(), amount));
         this.save();
         return true;
     }
@@ -155,26 +155,30 @@ public class JsonStorage extends AbstractStorage {
 
     @Override
     public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
-        List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
-        dataList.sort(Comparator.comparingDouble(PlayerData::getMoney).reversed());
-        val data = new ArrayList<TopManager.TopLineDouble>(amount);
-        int dataListSize = dataList.size();
+        Map<String, Double> map = new HashMap<>();
+        this.playersCache.forEach((nickName, playerData) -> map.put(nickName, playerData.getMoney()));
+        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        Collections.reverse(sortedList);
+        var data = new ArrayList<TopManager.TopLineDouble>(amount);
+        int dataListSize = sortedList.size();
         for (int i = 0; i < amount && dataListSize != i; i++) {
-            val pd = dataList.get(i);
-            data.add(new TopManager.TopLineDouble(pd.getPlayerName(), pd.getMoney(), i+1));
+            var entry = sortedList.get(i);
+            data.add(new TopManager.TopLineDouble(entry.getKey(), entry.getValue(), i+1));
         }
         return data;
     }
 
     @Override
     public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
-        List<PlayerData> dataList = new ArrayList<>(this.playersCache.values());
-        dataList.sort(Comparator.comparingInt(PlayerData::getCoins).reversed());
-        val data = new ArrayList<TopManager.TopLineInteger>(amount);
-        int dataListSize = dataList.size();
+        Map<String, Integer> map = new HashMap<>();
+        this.playersCache.forEach((nickName, playerData) -> map.put(nickName, playerData.getCoins()));
+        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        Collections.reverse(sortedList);
+        var data = new ArrayList<TopManager.TopLineInteger>(amount);
+        int dataListSize = sortedList.size();
         for (int i = 0; i < amount && dataListSize != i; i++) {
-            val pd = dataList.get(i);
-            data.add(new TopManager.TopLineInteger(pd.getPlayerName(), pd.getCoins(), i+1));
+            var entry = sortedList.get(i);
+            data.add(new TopManager.TopLineInteger(entry.getKey(), entry.getValue(), i+1));
         }
         return data;
     }

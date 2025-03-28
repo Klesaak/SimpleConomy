@@ -32,6 +32,11 @@ public abstract class AbstractStorage implements AutoCloseable {
 
     public abstract void clearBalances(String nickName);
 
+    /**
+     *
+     * @param amount - кол-во игроков в списке топа.
+     * @return - список никнейм-сумма-место в топе. (идут сверху вниз в порядке возрастания)
+     */
     public abstract List<TopManager.TopLineDouble> getMoneyTop(int amount);
     public abstract List<TopManager.TopLineInteger> getCoinsTop(int amount);
 

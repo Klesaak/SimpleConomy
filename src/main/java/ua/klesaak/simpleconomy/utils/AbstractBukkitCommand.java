@@ -5,12 +5,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.configurations.Message;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AbstractBukkitCommand implements CommandExecutor {
+public abstract class AbstractBukkitCommand implements CommandExecutor, TabCompleter {
+
+    public AbstractBukkitCommand(JavaPlugin plugin, String commandName) {
+        Objects.requireNonNull(plugin.getCommand(commandName)).setExecutor(this);
+        Objects.requireNonNull(plugin.getCommand(commandName)).setTabCompleter(this);
+    }
 
     @Override
     public boolean onCommand(@NonNull CommandSender commandSender, @NonNull Command command, @NonNull String label, String[] args) {
@@ -22,7 +31,14 @@ public abstract class AbstractBukkitCommand implements CommandExecutor {
         return false;
     }
 
-    public abstract void onReceiveCommand(CommandSender sender, String label, String[] args);
+    @Override
+    public List<String> onTabComplete(@NonNull CommandSender commandSender, @NonNull Command command, @NonNull String label, String[] args) {
+        return this.onTabSuggest(commandSender, args);
+    }
+
+    protected abstract void onReceiveCommand(CommandSender sender, String label, String[] args);
+
+    protected abstract List<String> onTabSuggest(CommandSender sender, String[] args);
 
     public void cmdVerifyArgs(int minimum, String[] args, String usage) {
         if (args.length < minimum) {
@@ -56,7 +72,7 @@ public abstract class AbstractBukkitCommand implements CommandExecutor {
     }
 
     public <T> T cmdVerifyOptional(Optional<T> optional, String usage) {
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             throw new AbstractCommandException(ChatColor.RED + usage);
         }
         return optional.get();

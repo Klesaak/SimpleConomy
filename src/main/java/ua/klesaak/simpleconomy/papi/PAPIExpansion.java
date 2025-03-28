@@ -48,20 +48,12 @@ public class PAPIExpansion extends PlaceholderExpansion {
         val storage = this.manager.getStorage();
         val configFile = this.manager.getConfigFile();
         val playerName = player.getName().toLowerCase();
-        switch (identifier.toLowerCase()) {
-            case "coins": {
-                return String.valueOf(storage.getCoinsBalance(playerName));
-            }
-            case "money": {
-                return String.valueOf(storage.getMoneyBalance(playerName));
-            }
-            case "coins_formatted": {
-                return configFile.formatCoins(storage.getCoinsBalance(playerName));
-            }
-            case "money_formatted": {
-                return configFile.formatMoney(storage.getMoneyBalance(playerName));
-            }
-        }
-        return "";
+        return switch (identifier.toLowerCase()) {
+            case "coins" -> String.valueOf(storage.getCoinsBalance(playerName));
+            case "money" -> String.valueOf(storage.getMoneyBalance(playerName));
+            case "coins_formatted" -> configFile.formatCoins(storage.getCoinsBalance(playerName));
+            case "money_formatted" -> configFile.formatMoney(storage.getMoneyBalance(playerName));
+            default -> "";
+        };
     }
 }

@@ -2,25 +2,25 @@ package ua.klesaak.simpleconomy.commands;
 
 import lombok.NonNull;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static ua.klesaak.simpleconomy.configurations.MessagesFile.*;
 
-public class AdminCommands extends AbstractBukkitCommand implements TabCompleter {
+public class AdminCommands extends AbstractBukkitCommand {
     private static final List<String> SUB_COMMANDS0 = Arrays.asList("reload", "addmoney", "addcoins", "wmoney", "wcoins", "setmoney", "setcoins", "clear");
     private final SimpleEconomyManager manager;
 
     public AdminCommands(SimpleEconomyManager manager) {
+        super(manager.getPlugin(), "sconomy");
         this.manager = manager;
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("sconomy")).setExecutor(this);
-        Objects.requireNonNull(this.manager.getPlugin().getCommand("sconomy")).setTabCompleter(this);
     }
 
 
@@ -142,7 +142,7 @@ public class AdminCommands extends AbstractBukkitCommand implements TabCompleter
     }
 
     @Override
-    public List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String[] args) {
+    public List<String> onTabSuggest(@NonNull CommandSender sender, String[] args) {
         if (args.length == 1) {
             return UtilityMethods.copyPartialMatches(args[0].toLowerCase(), SUB_COMMANDS0, new ArrayList<>());
         }

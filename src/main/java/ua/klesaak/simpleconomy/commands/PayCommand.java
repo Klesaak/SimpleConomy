@@ -33,12 +33,7 @@ public class PayCommand extends AbstractBukkitCommand {
         var senderBalance = storage.getMoneyBalance(senderNameLC);
         var playerName = args[0];
         var playerNameLC = playerName.toLowerCase();
-        int sum = 0;
-        try {
-            sum = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            messagesFile.getNotInteger().tag(NUMBER_PATTERN, args[1]).send(sender);
-        }
+        int sum = this.cmdVerifyInt(args[1], messagesFile.getNotInteger().tag(NUMBER_PATTERN, args[1]));
         if (playerSender.getName().equalsIgnoreCase(playerName)) {
             messagesFile.getPaySelf().send(sender);
             return;

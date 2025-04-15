@@ -2,6 +2,7 @@ package ua.klesaak.simpleconomy.manager;
 
 import lombok.Getter;
 import lombok.val;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,7 +10,6 @@ import org.bukkit.plugin.ServicePriority;
 import ua.klesaak.simpleconomy.SimpleConomyPlugin;
 import ua.klesaak.simpleconomy.api.SimpleEconomyAPI;
 import ua.klesaak.simpleconomy.commands.AdminCommands;
-import ua.klesaak.simpleconomy.commands.BalTopCommand;
 import ua.klesaak.simpleconomy.commands.BalanceCommand;
 import ua.klesaak.simpleconomy.commands.PayCommand;
 import ua.klesaak.simpleconomy.configurations.ConfigFile;
@@ -22,6 +22,8 @@ import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 @Getter
 public class SimpleEconomyManager {
+    public static BukkitAudiences BUKKIT_AUDIENCES;
+
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
@@ -49,8 +51,8 @@ public class SimpleEconomyManager {
         SimpleEconomyAPI.register(this);
         if (this.configFile.isTopEnabled()) {
             this.topManager = new TopManager(this, this.configFile);
-            new BalTopCommand(this);
         }
+        BUKKIT_AUDIENCES = BukkitAudiences.create(this.plugin);
     }
 
     private void initStorage() {
@@ -85,5 +87,9 @@ public class SimpleEconomyManager {
             this.papiExpansion.unregister();
         }
         this.topManager.close();
+        if(BUKKIT_AUDIENCES != null) {
+            BUKKIT_AUDIENCES.close();
+            BUKKIT_AUDIENCES = null;
+        }
     }
 }

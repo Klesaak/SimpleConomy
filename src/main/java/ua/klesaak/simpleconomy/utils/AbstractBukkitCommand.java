@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.utils;
 
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -42,20 +41,20 @@ public abstract class AbstractBukkitCommand implements CommandExecutor, TabCompl
 
     public void cmdVerifyArgs(int minimum, String[] args, String usage) {
         if (args.length < minimum) {
-            throw new AbstractCommandException(ChatColor.RED + usage);
+            throw new AbstractCommandException(usage);
         }
     }
 
     public Player cmdVerifyPlayer(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            throw new AbstractCommandException(ChatColor.RED + "Must be player");
+            throw new AbstractCommandException("Must be player");
         }
         return (Player)sender;
     }
 
     public void cmdVerifyPermission(CommandSender sender, String permission) {
         if (!sender.hasPermission(permission)) {
-            throw new AbstractCommandException(ChatColor.RED + "Do not have permission");
+            throw new AbstractCommandException("Do not have permission");
         }
     }
 
@@ -67,13 +66,13 @@ public abstract class AbstractBukkitCommand implements CommandExecutor, TabCompl
 
     public void cmdVerify(boolean predicate, String usage) {
         if (predicate) {
-            throw new AbstractCommandException(ChatColor.RED + usage);
+            throw new AbstractCommandException(usage);
         }
     }
 
     public <T> T cmdVerifyOptional(Optional<T> optional, String usage) {
         if (optional.isEmpty()) {
-            throw new AbstractCommandException(ChatColor.RED + usage);
+            throw new AbstractCommandException(usage);
         }
         return optional.get();
     }
@@ -82,7 +81,15 @@ public abstract class AbstractBukkitCommand implements CommandExecutor, TabCompl
         try {
             return Integer.parseInt(number);
         } catch (NumberFormatException e) {
-            throw new AbstractCommandException(ChatColor.RED + "Can't cast word to number");
+            throw new AbstractCommandException("Can't cast word to number");
+        }
+    }
+
+    public int cmdVerifyInt(String number, Message errorMessage) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            throw new AbstractCommandException(errorMessage);
         }
     }
 

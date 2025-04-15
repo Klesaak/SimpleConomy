@@ -36,13 +36,3 @@ coinsNoPlayerMoney:             "<gold>У игрока <red>не достато�
 coinsSenderWithdrawn:           "<gold>С игрока <red>(player)<gold> снято <red>(coins)<gold>."
 coinsAddMoney:                  "<gold>Вы успешно выдали игроку <aqua>(player) (coins)<gold>."
 coinsSetMoney:                  "<gold>Вы успешно установили игроку <aqua>(player) (coins)<gold>."
-
-moneyTopIsEmpty:                "<red>Список крестьян пока пуст!"
-coinsTopIsEmpty:                "<red>Список евреев пока пуст!"
-moneyTop:
-  - "<red>Топ богачей сервера."
-  - "(top)"
-
-coinsTop:
-  - "<red>Топ богачей сервера по коинам."
-  - "(top)"

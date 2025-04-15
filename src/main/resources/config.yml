@@ -3,6 +3,12 @@
 # sc_money - кол-во денег игрока.
 # sc_coins_formatted - кол-во коинов игрока в отформатированном виде (см. ниже plural, singular, plural2).
 # sc_money_formatted - кол-во денег игрока в отформатированном виде (см. ниже plural, singular, plural2).
+# sc_coins_top_player_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
+# sc_money_top_player_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
+# sc_coins_top_%место% - баланс игрока по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
+# sc_money_top_%место% - баланс игрока по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
+# sc_coins_top_formatted_%место% - баланс игрока в отформатированном виде по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
+# sc_money_top_formatted_%место% - баланс игрока в отформатированном виде по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
 
 #Доступные хранилища: jedis, file
 storage: file
@@ -40,7 +46,6 @@ playerTop:
   coinsCount: 10
   #Интервал обновления топов
   updateInterval: 1m
-  topFormat: "(index). (player) (balance)"
 
 currencyFormat:
   plural: 'монетки'

@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.utils.UtilityMethods;
 
 import java.util.regex.Pattern;
@@ -24,13 +25,13 @@ public class Message {
     }
 
     public void send(CommandSender sender) {
-        sender.sendMessage(MINI_MESSAGE.deserialize(this.miniMessage));
+        SimpleEconomyManager.BUKKIT_AUDIENCES.sender(sender).sendMessage(MINI_MESSAGE.deserialize(this.miniMessage));
     }
 
     public void broadcast() {
         Component message = MINI_MESSAGE.deserialize(this.miniMessage);
-        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(message));
-        Bukkit.getConsoleSender().sendMessage(message);
+        Bukkit.getOnlinePlayers().forEach(player -> SimpleEconomyManager.BUKKIT_AUDIENCES.sender(player).sendMessage(message));
+        SimpleEconomyManager.BUKKIT_AUDIENCES.sender(Bukkit.getConsoleSender()).sendMessage(message);
     }
 
     public static class TagMessage extends Message {

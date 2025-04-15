@@ -24,7 +24,6 @@ import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 @Commands({
         @Command(name = "sconomy", aliases = {"scon", "seco"}, desc = "Admin command.", permission = "simpleconomy.admin"),
         @Command(name = "balance", aliases = {"money", "emoney", "ebalance", "bal", "ebal", "eco", "coins"}, desc = "Command to check your balance."),
-        @Command(name = "baltop", aliases = "ebaltop", desc = "Command to check top balance."),
         @Command(name = "pay", aliases  = {"epay", "wpay"}, desc = "Player money transaction command.")
 })
 @Description("Simple high performance economy plugin.")

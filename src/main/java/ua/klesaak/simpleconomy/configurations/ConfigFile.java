@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.storage.StorageType;
-import ua.klesaak.simpleconomy.utils.MCColorUtils;
 import ua.klesaak.simpleconomy.utils.NumberUtils;
 
 import java.math.BigDecimal;
@@ -19,7 +18,6 @@ public class ConfigFile extends PluginConfig {
     private final String storage;
     private final int maxBalance, maxCoins, startBalance, startCoins, minTransactionSum;
     private final int playerTopMoneyCount, playerTopCoinsCount, playerTopUpdateTickInterval;
-    private final String topFormat;
     private final boolean isTopEnabled;
     private final boolean payCommandEnabled;
     private final String currencyFormatPlural, currencyFormatSingular, currencyFormatPlural2, currencyCoinsFormatPlural, currencyCoinsFormatSingular, currencyCoinsFormatPlural2;
@@ -40,7 +38,6 @@ public class ConfigFile extends PluginConfig {
         this.playerTopMoneyCount = this.getInt("playerTop.balanceCount");
         this.playerTopCoinsCount = this.getInt("playerTop.coinsCount");
         this.playerTopUpdateTickInterval = (int) (NumberUtils.parseTimeFromString(Objects.requireNonNull(this.getString("playerTop.updateInterval")), TimeUnit.SECONDS) * 20);
-        this.topFormat = MCColorUtils.color(this.getString("playerTop.topFormat"));
         this.currencyFormatPlural = this.getString("currencyFormat.plural");
         this.currencyFormatSingular = this.getString("currencyFormat.singular");
         this.currencyFormatPlural2 = this.getString("currencyFormat.plural2");

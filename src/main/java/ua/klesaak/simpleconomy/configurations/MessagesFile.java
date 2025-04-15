@@ -23,8 +23,6 @@ public class MessagesFile extends PluginConfig {
     private final Message balanceInfo, balanceInfoOther, vaultPaySuccessful, vaultPayErrorMaxBalance, vaultNoMoney, vaultPayReceived, errorMinTransaction, vaultNoPlayerMoney, vaultPayUsage;
     private final Message vaultSenderWithdrawn, playerNotFound, notInteger, paySelf, vaultAddMoney, vaultSetMoney;
     private final Message coinsNoPlayerMoney, coinsSenderWithdrawn, coinsAddMoney, coinsSetMoney;
-    private final Message moneyTopIsEmpty, coinsTopIsEmpty;
-    private final String moneyTopFormat, coinsTopFormat;
 
 
     public MessagesFile(JavaPlugin plugin) {
@@ -48,10 +46,6 @@ public class MessagesFile extends PluginConfig {
         this.coinsSenderWithdrawn = new Message(this.getStringValue("coinsSenderWithdrawn"));
         this.coinsAddMoney = new Message(this.getStringValue("coinsAddMoney"));
         this.coinsSetMoney = new Message(this.getStringValue("coinsSetMoney"));
-        this.moneyTopFormat = this.getStringValue("moneyTop");
-        this.coinsTopFormat = this.getStringValue("coinsTop");
-        this.moneyTopIsEmpty = new Message(this.getStringValue("moneyTopIsEmpty"));
-        this.coinsTopIsEmpty = new Message(this.getStringValue("coinsTopIsEmpty"));
     }
 
     private String getStringValue(String key) {

@@ -21,8 +21,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -48,7 +48,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern> com.zaxxer.hikari</pattern>
+                                    <pattern>com.zaxxer.hikari</pattern>
                                     <shadedPattern>ua.klesaak.libs.com.zaxxer.hikari</shadedPattern>
                                 </relocation>
                                 <relocation>
@@ -162,7 +162,8 @@
                                     <exclude>junit.textui</exclude>
                                     <exclude>junit:junit:jar</exclude>
                                     <exclude>org.junit.jupiter</exclude>
-                                    <exclude>org.junit.platform</exclude>
+                                    <exclude>org.jetbrains</exclude>
+                                    <exclude>org.intellij</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>
@@ -215,6 +216,7 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>plugin-annotations</artifactId>
             <version>1.2.3-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
@@ -246,7 +248,18 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
             <version>4.18.0</version>
-            <scope>compile</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.kyori/adventure-api -->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.18.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.kyori/adventure-platform-bukkit -->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.3.4</version>
         </dependency>
 
     </dependencies>

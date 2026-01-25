@@ -1,5 +1,9 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import redis.clients.jedis.Jedis;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
@@ -7,7 +11,6 @@ import ua.klesaak.simpleconomy.storage.AbstractStorage;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class RedisStorage extends AbstractStorage {
     private final RedisConfig redisConfig;
@@ -143,36 +146,34 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
-        Map<String, Double> map = new HashMap<>();
+        TObjectDoubleMap<String> doubleMap = new TObjectDoubleHashMap<>();
         try (Jedis jedis = this.redisPool.getRedis()) {
             jedis.select(this.redisConfig.getDatabase());
-            jedis.hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> map.put(s, Double.parseDouble(s2)));
+            jedis.hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> doubleMap.put(s, Double.parseDouble(s2)));
         }
+        List<String> keys = new ArrayList<>(doubleMap.keySet());
+        keys.sort(Comparator.comparingDouble(doubleMap::get));
         var dataList = new ArrayList<TopManager.TopLineDouble>();
-        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
-        Collections.reverse(sortedList);
-        int sortedListSize = sortedList.size();
-        for (int i = 0; i < amount && sortedListSize != i; i++) {
-            var entry = sortedList.get(i);
-            dataList.add(new TopManager.TopLineDouble(entry.getKey(), entry.getValue(), i+1));
+        for (int i = 0; i < amount && keys.size() != i; i++) {
+            String key = keys.get(i);
+            dataList.add(new TopManager.TopLineDouble(key, doubleMap.get(key), i+1));
         }
         return dataList;
     }
 
     @Override
     public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
-        Map<String, Integer> map = new HashMap<>();
+        TObjectIntMap<String> intMap = new TObjectIntHashMap<>();
         try (Jedis jedis = this.redisPool.getRedis()) {
             jedis.select(this.redisConfig.getDatabase());
-            jedis.hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> map.put(s, Integer.parseInt(s2)));
+            jedis.hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> intMap.put(s, Integer.parseInt(s2)));
         }
+        List<String> keys = new ArrayList<>(intMap.keySet());
+        keys.sort(Comparator.comparingInt(intMap::get));
         var dataList = new ArrayList<TopManager.TopLineInteger>();
-        var sortedList = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
-        Collections.reverse(sortedList);
-        int sortedListSize = sortedList.size();
-        for (int i = 0; i < amount && sortedListSize != i; i++) {
-            var entry = sortedList.get(i);
-            dataList.add(new TopManager.TopLineInteger(entry.getKey(), entry.getValue(), i+1));
+        for (int i = 0; i < amount && keys.size() != i; i++) {
+            String key = keys.get(i);
+            dataList.add(new TopManager.TopLineInteger(key, intMap.get(key), i+1));
         }
         return dataList;
     }

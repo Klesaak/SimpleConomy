@@ -29,7 +29,6 @@ public class UtilityMethods {
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) return matcher.replaceAll(Matcher.quoteReplacement(replacement.get()));
         return input;
-
     }
 
     public  <T extends Collection<? super String>> T copyPartialMatches(String token, Iterable<String> originals, T collection) {

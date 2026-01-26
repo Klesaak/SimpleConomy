@@ -4,7 +4,7 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.RedisClient;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
@@ -14,12 +14,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class RedisStorage extends AbstractStorage {
     private final RedisConfig redisConfig;
-    private final RedisConfig.RedisPool redisPool;
 
     public RedisStorage(SimpleEconomyManager manager) {
         super(manager);
         this.redisConfig = new RedisConfig(manager.getConfigFile().getRedisSection());
-        this.redisPool = this.redisConfig.newRedisPool();
         manager.getPlugin().getLogger().info("RedisStorage has been started!");
     }
 
@@ -31,11 +29,8 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public double getMoneyBalance(String nickName) {
         return CompletableFuture.supplyAsync(() -> {
-            try (Jedis jedis = this.redisPool.getRedis()) {
-                jedis.select(this.redisConfig.getDatabase());
-                String money = jedis.hget(this.redisConfig.getBalanceKey(), nickName);
-                return money == null ? manager.getConfigFile().getStartBalance() : Double.parseDouble(money);
-            }
+            String money = this.redisConfig.getRedisClient().hget(this.redisConfig.getBalanceKey(), nickName);
+            return money == null ? manager.getConfigFile().getStartBalance() : Double.parseDouble(money);
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return 0.0;
@@ -65,11 +60,8 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public boolean setMoney(String nickName, double amount) {
         return CompletableFuture.supplyAsync(() -> {
-            try (Jedis jedis = this.redisPool.getRedis()) {
-                jedis.select(this.redisConfig.getDatabase());
-                jedis.hset(this.redisConfig.getBalanceKey(), nickName, String.valueOf(amount));
-                return true;
-            }
+            this.redisConfig.getRedisClient().hset(this.redisConfig.getBalanceKey(), nickName, String.valueOf(amount));
+            return true;
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return false;
@@ -79,11 +71,8 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public int getCoinsBalance(String nickName) {
         return CompletableFuture.supplyAsync(() -> {
-            try (Jedis jedis = this.redisPool.getRedis()) {
-                jedis.select(this.redisConfig.getDatabase());
-                String coins = jedis.hget(this.redisConfig.getCoinsKey(), nickName);
-                return coins == null ? manager.getConfigFile().getStartCoins() : Integer.parseInt(coins);
-            }
+            String coins = this.redisConfig.getRedisClient().hget(this.redisConfig.getCoinsKey(), nickName);
+            return coins == null ? manager.getConfigFile().getStartCoins() : Integer.parseInt(coins);
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return 0;
@@ -113,11 +102,8 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public boolean setCoins(String nickName, int amount) {
         return CompletableFuture.supplyAsync(() -> {
-            try (Jedis jedis = this.redisPool.getRedis()) {
-                jedis.select(this.redisConfig.getDatabase());
-                jedis.hset(this.redisConfig.getCoinsKey(), nickName, String.valueOf(amount));
-                return true;
-            }
+            this.redisConfig.getRedisClient().hset(this.redisConfig.getCoinsKey(), nickName, String.valueOf(amount));
+            return true;
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return false;
@@ -126,18 +112,16 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public boolean createAccount(String nickName) {
-        System.out.println("S-ECON-DEBUG: JsonStorage.class, createAccount method has been called.");
+        System.out.println("S-ECON-DEBUG: RedisStorage.class, createAccount method has been called.");
         return true;
     }
 
     @Override
     public void clearBalances(String nickName) {
         CompletableFuture.runAsync(() -> {
-            try (Jedis jedis = this.redisPool.getRedis()) {
-                jedis.select(this.redisConfig.getDatabase());
-                jedis.hdel(this.redisConfig.getBalanceKey(), nickName);
-                jedis.hdel(this.redisConfig.getCoinsKey(), nickName);
-            }
+            RedisClient redisClient = this.redisConfig.getRedisClient();
+            redisClient.hdel(this.redisConfig.getBalanceKey(), nickName);
+            redisClient.hdel(this.redisConfig.getCoinsKey(), nickName);
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return null;
@@ -147,10 +131,7 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
         TObjectDoubleMap<String> doubleMap = new TObjectDoubleHashMap<>();
-        try (Jedis jedis = this.redisPool.getRedis()) {
-            jedis.select(this.redisConfig.getDatabase());
-            jedis.hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> doubleMap.put(s, Double.parseDouble(s2)));
-        }
+        this.redisConfig.getRedisClient().hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> doubleMap.put(s, Double.parseDouble(s2)));
         List<String> keys = new ArrayList<>(doubleMap.keySet());
         keys.sort(Comparator.comparingDouble(doubleMap::get));
         var dataList = new ArrayList<TopManager.TopLineDouble>();
@@ -164,10 +145,7 @@ public class RedisStorage extends AbstractStorage {
     @Override
     public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
         TObjectIntMap<String> intMap = new TObjectIntHashMap<>();
-        try (Jedis jedis = this.redisPool.getRedis()) {
-            jedis.select(this.redisConfig.getDatabase());
-            jedis.hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> intMap.put(s, Integer.parseInt(s2)));
-        }
+        this.redisConfig.getRedisClient().hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> intMap.put(s, Integer.parseInt(s2)));
         List<String> keys = new ArrayList<>(intMap.keySet());
         keys.sort(Comparator.comparingInt(intMap::get));
         var dataList = new ArrayList<TopManager.TopLineInteger>();
@@ -180,6 +158,6 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public void close() {
-        if (this.redisPool != null) this.redisPool.close();
+        if (this.redisConfig != null) this.redisConfig.close();
     }
 }

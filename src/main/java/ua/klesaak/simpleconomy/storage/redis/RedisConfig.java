@@ -1,16 +1,15 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
 import lombok.Getter;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.bukkit.configuration.ConfigurationSection;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.exceptions.JedisException;
+import redis.clients.jedis.*;
 
 @Getter
-public class RedisConfig {
+public class RedisConfig implements AutoCloseable {
     private final String address, password, balanceKey, coinsKey;
     private final int port, database;
+    private final RedisClient redisClient;
 
     public RedisConfig(ConfigurationSection configurationSection) {
         this.address = configurationSection.getString("host");
@@ -19,31 +18,26 @@ public class RedisConfig {
         this.password = configurationSection.getString("password");
         this.balanceKey = configurationSection.getString("balanceKey");
         this.coinsKey = configurationSection.getString("coinsKey");
+
+        HostAndPort hostAndPort = new HostAndPort(this.address, this.port);
+        DefaultJedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
+                .timeoutMillis(30_000)
+                .database(this.database)
+                .password(this.password == null || this.password.isEmpty() ? null : this.password).build();
+        GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setLifo(false);
+        poolConfig.setTestOnBorrow(true);
+        poolConfig.setMinIdle(3);
+        poolConfig.setMaxTotal(500);
+        this.redisClient = RedisClient.builder()
+                .poolConfig(poolConfig)
+                .clientConfig(clientConfig)
+                .hostAndPort(hostAndPort).build();
     }
 
-    public RedisPool newRedisPool() throws JedisException {
-        return new RedisPool(this.address, this.port, this.password);
-    }
 
-    public static class RedisPool implements AutoCloseable {
-        private final JedisPool pool;
-
-        public RedisPool(String host, int port, String pass) {
-            var jpc = new JedisPoolConfig();
-            jpc.setLifo(false);
-            jpc.setTestOnBorrow(true);
-            jpc.setMinIdle(3);
-            jpc.setMaxTotal(500);
-            this.pool = new JedisPool(jpc, host, port, 30000, pass == null || pass.isEmpty() ? null : pass);
-        }
-
-        public Jedis getRedis() {
-            return this.pool.getResource();
-        }
-
-        @Override
-        public void close() {
-            if (this.pool != null) this.pool.destroy();
-        }
+    @Override
+    public void close() {
+        if (this.redisClient != null) this.redisClient.close();
     }
 }

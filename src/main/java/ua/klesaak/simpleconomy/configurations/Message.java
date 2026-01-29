@@ -6,9 +6,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.utils.UtilityMethods;
-
-import java.util.regex.Pattern;
 
 @Getter
 public class Message {
@@ -20,8 +17,8 @@ public class Message {
         this.miniMessage = miniMessage;
     }
 
-    public TagMessage tag(Pattern pattern, Object replacement) {
-        return new TagMessage(UtilityMethods.replaceAll(pattern, this.miniMessage, ()-> String.valueOf(replacement)));
+    public TagMessage tag(String pattern, Object replacement) {
+        return new TagMessage(this.miniMessage.replace(pattern, String.valueOf(replacement)));
     }
 
     public void send(CommandSender sender) {
@@ -41,8 +38,8 @@ public class Message {
         }
 
         @Override
-        public TagMessage tag(Pattern pattern, Object replacement) {
-            this.miniMessage = UtilityMethods.replaceAll(pattern, this.miniMessage, ()-> String.valueOf(replacement));
+        public TagMessage tag(String pattern, Object replacement) {
+            this.miniMessage = this.miniMessage.replace(pattern, String.valueOf(replacement));
             return this;
         }
     }

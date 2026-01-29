@@ -4,21 +4,19 @@ import com.google.common.base.Joiner;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.regex.Pattern;
-
 @Getter
 public class MessagesFile extends PluginConfig {
-    public static final Pattern BALANCE_PATTERN     = Pattern.compile("(balance)", Pattern.LITERAL);
-    public static final Pattern NEW_BALANCE_PATTERN = Pattern.compile("(new-balance)", Pattern.LITERAL);
-    public static final Pattern MAX_BALANCE_PATTERN = Pattern.compile("(max-balance)", Pattern.LITERAL);
-    public static final Pattern LABEL_PATTERN       = Pattern.compile("(label)", Pattern.LITERAL);
-    public static final Pattern COINS_PATTERN       = Pattern.compile("(coins)", Pattern.LITERAL);
-    public static final Pattern PLAYER_PATTERN      = Pattern.compile("(player)", Pattern.LITERAL);
-    public static final Pattern MONEY_PATTERN       = Pattern.compile("(money)", Pattern.LITERAL);
-    public static final Pattern SUM_PATTERN         = Pattern.compile("(sum)", Pattern.LITERAL);
-    public static final Pattern TOP_PATTERN         = Pattern.compile("(top)", Pattern.LITERAL);
-    public static final Pattern INDEX_PATTERN       = Pattern.compile("(index)", Pattern.LITERAL);
-    public static final Pattern NUMBER_PATTERN      = Pattern.compile("(number)", Pattern.LITERAL);
+    public static final String BALANCE_PATTERN     = "(balance)";
+    public static final String NEW_BALANCE_PATTERN = "(new-balance)";
+    public static final String MAX_BALANCE_PATTERN = "(max-balance)";
+    public static final String LABEL_PATTERN       = "(label)";
+    public static final String COINS_PATTERN       = "(coins)";
+    public static final String PLAYER_PATTERN      = "(player)";
+    public static final String MONEY_PATTERN       = "(money)";
+    public static final String SUM_PATTERN         = "(sum)";
+    public static final String TOP_PATTERN         = "(top)";
+    public static final String INDEX_PATTERN       = "(index)";
+    public static final String NUMBER_PATTERN      = "(number)";
 
     private final Message balanceInfo, balanceInfoOther, vaultPaySuccessful, vaultPayErrorMaxBalance, vaultNoMoney, vaultPayReceived, errorMinTransaction, vaultNoPlayerMoney, vaultPayUsage;
     private final Message vaultSenderWithdrawn, playerNotFound, notInteger, paySelf, vaultAddMoney, vaultSetMoney;

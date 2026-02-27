@@ -28,13 +28,13 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public double getMoneyBalance(String nickName) {
-        return CompletableFuture.supplyAsync(() -> {
+        try {
             String money = this.redisConfig.getRedisClient().hget(this.redisConfig.getBalanceKey(), nickName);
             return money == null ? manager.getConfigFile().getStartBalance() : Double.parseDouble(money);
-        }).exceptionally(throwable -> {
-            manager.getPlugin().getLogger().info(throwable.getMessage());
-            return 0.0;
-        }).join();
+        } catch (Exception e) {
+            manager.getPlugin().getLogger().warning(e.getMessage());
+        }
+        return 0.0;
     }
 
     @Override
@@ -59,24 +59,24 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public boolean setMoney(String nickName, double amount) {
-        return CompletableFuture.supplyAsync(() -> {
+        try {
             this.redisConfig.getRedisClient().hset(this.redisConfig.getBalanceKey(), nickName, String.valueOf(amount));
             return true;
-        }).exceptionally(throwable -> {
-            manager.getPlugin().getLogger().info(throwable.getMessage());
+        } catch (Exception e) {
+            manager.getPlugin().getLogger().warning(e.getMessage());
             return false;
-        }).join();
+        }
     }
 
     @Override
     public int getCoinsBalance(String nickName) {
-        return CompletableFuture.supplyAsync(() -> {
+        try {
             String coins = this.redisConfig.getRedisClient().hget(this.redisConfig.getCoinsKey(), nickName);
             return coins == null ? manager.getConfigFile().getStartCoins() : Integer.parseInt(coins);
-        }).exceptionally(throwable -> {
-            manager.getPlugin().getLogger().info(throwable.getMessage());
+        } catch (Exception e) {
+            manager.getPlugin().getLogger().warning(e.getMessage());
             return 0;
-        }).join();
+        }
     }
 
     @Override
@@ -101,13 +101,13 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public boolean setCoins(String nickName, int amount) {
-        return CompletableFuture.supplyAsync(() -> {
+        try {
             this.redisConfig.getRedisClient().hset(this.redisConfig.getCoinsKey(), nickName, String.valueOf(amount));
             return true;
-        }).exceptionally(throwable -> {
-            manager.getPlugin().getLogger().info(throwable.getMessage());
+        } catch (Exception e) {
+            manager.getPlugin().getLogger().info(e.getMessage());
             return false;
-        }).join();
+        }
     }
 
     @Override

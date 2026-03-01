@@ -52,6 +52,7 @@ public class SimpleEconomyManager {
         if (this.configFile.isTopEnabled()) {
             this.topManager = new TopManager(this, this.configFile);
         }
+        new SConomyListener(this);
         BUKKIT_AUDIENCES = BukkitAudiences.create(this.plugin);
     }
 

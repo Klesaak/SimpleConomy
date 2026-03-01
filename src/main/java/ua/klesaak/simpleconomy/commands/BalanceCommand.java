@@ -3,7 +3,6 @@ package ua.klesaak.simpleconomy.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
-import ua.klesaak.simpleconomy.utils.AbstractBukkitCommand;
 
 import java.util.Collections;
 import java.util.List;

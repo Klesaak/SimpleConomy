@@ -2,22 +2,20 @@ package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
 import lombok.Synchronized;
-import org.bukkit.Bukkit;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
+import ua.klesaak.simpleconomy.storage.PlayerData;
 import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class JsonStorage extends AbstractStorage {
     public static TypeToken<Map<String, PlayerData>> DATA_COLLECTION_TYPE = new TypeToken<>() {};
 
-    private final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
     private final JsonData storageFile;
     public JsonStorage(SimpleEconomyManager manager) {
         super(manager);
@@ -29,7 +27,17 @@ public class JsonStorage extends AbstractStorage {
 
     @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storageFile.write(this.playersCache, DATA_COLLECTION_TYPE.getType()));
+        CompletableFuture.runAsync(() -> this.storageFile.write(this.playersCache, DATA_COLLECTION_TYPE.getType()), this.executorService);
+    }
+
+    @Override
+    public void cache(String nickName) {
+
+    }
+
+    @Override
+    public void unCache(String nickName) {
+
     }
 
     @Override

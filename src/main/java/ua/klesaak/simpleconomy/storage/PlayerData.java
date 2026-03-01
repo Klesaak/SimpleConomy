@@ -1,16 +1,19 @@
-package ua.klesaak.simpleconomy.storage.file;
+package ua.klesaak.simpleconomy.storage;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class PlayerData {
     private double money;
     private int coins;
+
+    public PlayerData(double money, int coins) {
+        this.money = money;
+        this.coins = coins;
+    }
 
     public void withdrawMoney(double amount) {
         this.money -= amount;

@@ -10,6 +10,7 @@ public class RedisConfig implements AutoCloseable {
     private final String address, password, balanceKey, coinsKey;
     private final int port, database;
     private final RedisClient redisClient;
+    private final RedisClient pusSubRedisClient;
 
     public RedisConfig(ConfigurationSection configurationSection) {
         this.address = configurationSection.getString("host");
@@ -33,11 +34,20 @@ public class RedisConfig implements AutoCloseable {
                 .poolConfig(poolConfig)
                 .clientConfig(clientConfig)
                 .hostAndPort(hostAndPort).build();
+        this.pusSubRedisClient = RedisClient.builder()
+                .poolConfig(poolConfig)
+                .clientConfig(DefaultJedisClientConfig.builder()
+                                .timeoutMillis(30_000)
+                                .password(this.password == null || this.password.isEmpty() ? null : this.password)
+                                .build()
+                )
+                .build();
     }
 
 
     @Override
     public void close() {
         if (this.redisClient != null) this.redisClient.close();
+        if (this.pusSubRedisClient != null) this.pusSubRedisClient.close();
     }
 }

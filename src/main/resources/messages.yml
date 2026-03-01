@@ -12,7 +12,7 @@ vaultPaySuccessful:
   - "<gold>Ваш баланс<dark_grey>: <red>(new-balance)<gold>."
 vaultPayErrorMaxBalance:
   - "<gold>Сумма, которую вы пытаетесь перевести превысит максимальный баланс игрока."
-  - "<gold>Баланс игрока<dark_grey>: <red>(balance)<gold>. Максимально допустимый баланс: &e(max-balance)"
+  - "<gold>Баланс игрока<dark_grey>: <red>(balance)<gold>. Максимально допустимый баланс: <gold>(max-balance)"
 vaultNoMoney:
   - "<gold>Недостаточно средств на вашем балансе."
   - "<gold>Ваш баланс<dark_grey>: <red>(balance)<gold>."
@@ -29,8 +29,8 @@ vaultSenderWithdrawn:           "<gold>С игрока <red>(player)&7 снят�
 playerNotFound:                 "<gold>Игрок не найден или не в сети."
 notInteger:                     "<gold>Вы ввели неверное число<dark_grey>: <red>(number)"
 paySelf:                        "<gold>Вы <red>не можете<gold> перевести самому себе деньги."
-vaultAddMoney:                  "<gold>Вы успешно выдали <red>(player)&e (money) <gold>."
-vaultSetMoney:                  "<gold>Вы успешно установили <red>(player)&e (money) <gold>."
+vaultAddMoney:                  "<gold>Вы успешно выдали <red>(player)<gold> (money) <gold>."
+vaultSetMoney:                  "<gold>Вы успешно установили <red>(player)<gold> (money) <gold>."
 
 coinsNoPlayerMoney:             "<gold>У игрока <red>не достаточно<gold> средств."
 coinsSenderWithdrawn:           "<gold>С игрока <red>(player)<gold> снято <red>(coins)<gold>."

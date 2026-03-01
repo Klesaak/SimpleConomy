@@ -1,4 +1,4 @@
-package ua.klesaak.simpleconomy.utils;
+package ua.klesaak.simpleconomy.commands;
 
 import lombok.NonNull;
 import org.bukkit.command.Command;

@@ -44,10 +44,12 @@ public class SimpleEconomyManager {
         new BalanceCommand(this);
         if (this.configFile.isPayCommandEnabled()) new PayCommand(this);
         //================COMMANDS================\\
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            this.papiExpansion = new PAPIExpansion(this);
-            this.papiExpansion.register();
-        }
+        Bukkit.getScheduler().runTaskLater(this.plugin, ()-> {
+            if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                this.papiExpansion = new PAPIExpansion(this);
+                this.papiExpansion.register();
+            }
+        }, 60L);
         SimpleEconomyAPI.register(this);
         if (this.configFile.isTopEnabled()) {
             this.topManager = new TopManager(this, this.configFile);

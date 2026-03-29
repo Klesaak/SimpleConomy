@@ -75,8 +75,7 @@ public class VaultEconomyHook implements Economy {
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
-        if (this.getBalance(player) + amount > this.manager.getConfigFile().getMaxBalance())
-            new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to deposit");
+        if (this.getBalance(player) + amount > this.manager.getConfigFile().getMaxBalance()) return new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to deposit");
         return manager.getStorage().depositMoney(Objects.requireNonNull(player.getName()).toLowerCase(), amount)
                 ? new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.SUCCESS, "Successful")
                 : new EconomyResponse(amount, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Failed to deposit");

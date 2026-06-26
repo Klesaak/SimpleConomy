@@ -1,7 +1,6 @@
 package ua.klesaak.simpleconomy.storage.file;
 
 import com.google.gson.reflect.TypeToken;
-import lombok.Synchronized;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
@@ -18,16 +17,15 @@ public class JsonStorage extends AbstractStorage {
 
     private final JsonData storageFile;
     public JsonStorage(SimpleEconomyManager manager) {
-        super(manager);
+        super(manager, 1);
         this.storageFile = new JsonData(new File(this.manager.getPlugin().getDataFolder(), "storage.json"));
         if (storageFile.getFile().length() > 0L) {
             this.playersCache.putAll(storageFile.readAll(DATA_COLLECTION_TYPE));
         }
     }
 
-    @Synchronized
     private void save() {
-        CompletableFuture.runAsync(() -> this.storageFile.write(this.playersCache, DATA_COLLECTION_TYPE.getType()), this.executorService);
+        CompletableFuture.runAsync(() -> this.storageFile.write(this.playersCache, DATA_COLLECTION_TYPE.getType()));
     }
 
     @Override

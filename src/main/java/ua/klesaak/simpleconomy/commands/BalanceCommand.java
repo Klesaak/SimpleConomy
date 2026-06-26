@@ -24,19 +24,18 @@ public class BalanceCommand extends AbstractBukkitCommand {
         var storage = manager.getStorage();
         if (args.length == 0) {
             Player playerSender = this.cmdVerifyPlayer(sender);
-            var senderNameLC = playerSender.getName().toLowerCase();
+            var senderName = playerSender.getName();
             messagesFile.getBalanceInfo()
-                    .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(senderNameLC)))
-                    .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(senderNameLC))).send(sender);
+                    .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(senderName)))
+                    .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(senderName))).send(sender);
             return;
         }
         if (args.length == 1 && sender.hasPermission("simpleconomy.others")) {
             String otherName = args[0];
-            String otherNameLC = otherName.toLowerCase();
-            if (storage.hasAccount(otherNameLC)) {
+            if (storage.hasAccount(otherName)) {
                 messagesFile.getBalanceInfoOther()
-                        .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(otherNameLC)))
-                        .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(otherNameLC)))
+                        .tag(BALANCE_PATTERN, configFile.formatMoney(storage.getMoneyBalance(otherName)))
+                        .tag(COINS_PATTERN, configFile.formatCoins(storage.getCoinsBalance(otherName)))
                         .tag(PLAYER_PATTERN, otherName).send(sender);
                 return;
             }

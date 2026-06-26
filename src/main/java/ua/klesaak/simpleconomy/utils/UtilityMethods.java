@@ -44,7 +44,6 @@ public class UtilityMethods {
         return string.length() >= prefix.length() && string.regionMatches(true, 0, prefix, 0, prefix.length());
     }
 
-    @SuppressWarnings("deprecation")
     public static OfflinePlayer getOfflinePlayer(String player) {
         return Optional.<OfflinePlayer>ofNullable(Bukkit.getPlayer(player)).orElseGet(() -> Bukkit.getOfflinePlayer(player));
     }

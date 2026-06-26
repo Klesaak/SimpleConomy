@@ -1,11 +1,11 @@
 package ua.klesaak.simpleconomy.vault;
 
 import lombok.experimental.UtilityClass;
+import net.klesaak.storagelib.api.NumberUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import ua.klesaak.simpleconomy.utils.NumberUtils;
 
 @UtilityClass
 public class VaultUtils {

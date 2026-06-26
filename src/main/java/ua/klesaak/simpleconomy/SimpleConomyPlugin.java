@@ -9,13 +9,15 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Description;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 
-@Plugin(name = "SimpleConomy", version = "0.1")
+@Plugin(name = "SimpleConomy", version = "0.7")
 @Author("Klesaak")
+@ApiVersion(ApiVersion.Target.v1_20)
 @SoftDependsOn({
         @SoftDependency("PlaceholderAPI"),
         @SoftDependency("Vault")

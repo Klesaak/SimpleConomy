@@ -1,10 +1,10 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import redis.clients.jedis.RedisClient;
+import io.lettuce.core.api.sync.RedisCommands;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
@@ -19,31 +19,38 @@ public class RedisStorage extends AbstractStorage {
     private final RedisConfig redisConfig;
     private final RedisMessenger redisMessenger;
 
+    private final RedisCommands<String, String> redisCommands;
+
     public RedisStorage(SimpleEconomyManager manager) {
-        super(manager);
-        this.redisConfig = new RedisConfig(manager.getConfigFile().getRedisSection());
+        RedisConfig config = new RedisConfig(manager.getConfigFile().getRedisSection());
+        this.redisConfig = config;
+        super(manager, config.getThreads());
+
         this.redisMessenger = new RedisMessenger(manager, this.redisConfig);
+        this.redisCommands = this.redisConfig.getStatefulRedisConnection().sync();
+
         manager.getPlugin().getLogger().info("RedisStorage has been started!");
     }
 
     @Override
     public void cache(String nickName) {
         PlayerData playerData = new PlayerData(0.0, 0);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
         CompletableFuture.runAsync(() -> {
-            String money = this.redisConfig.getRedisClient().hget(this.redisConfig.getBalanceKey(), nickName);
+            String money = this.redisCommands.hget(this.redisConfig.getBalanceKey(), playerNameLC);
             playerData.setMoney(money == null ? manager.getConfigFile().getStartBalance() : Double.parseDouble(money));
-            String coins = this.redisConfig.getRedisClient().hget(this.redisConfig.getCoinsKey(), nickName);
+            String coins = this.redisCommands.hget(this.redisConfig.getCoinsKey(), playerNameLC);
             playerData.setCoins(coins == null ? manager.getConfigFile().getStartCoins() : Integer.parseInt(coins));
         }, this.executorService).exceptionally(throwable -> {
             this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
         });
-        this.playersCache.put(nickName, playerData);
+        this.playersCache.put(playerNameLC, playerData);
     }
 
     @Override
     public void unCache(String nickName) {
-        this.playersCache.remove(nickName);
+        this.playersCache.remove(nickName.toLowerCase(Locale.ROOT));
     }
 
     @Override
@@ -53,12 +60,13 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public double getMoneyBalance(String nickName) {
-        PlayerData playerData = this.playersCache.get(nickName);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        PlayerData playerData = this.playersCache.get(playerNameLC);
         if (playerData != null) {
             return playerData.getMoney();
         }
         try {
-            String money = this.redisConfig.getRedisClient().hget(this.redisConfig.getBalanceKey(), nickName);
+            String money = this.redisCommands.hget(this.redisConfig.getBalanceKey(), playerNameLC);
             return money == null ? manager.getConfigFile().getStartBalance() : Double.parseDouble(money);
         } catch (Exception e) {
             manager.getPlugin().getLogger().warning(e.getMessage());
@@ -68,33 +76,36 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public boolean hasMoney(String nickName, double amount) {
-        return this.getMoneyBalance(nickName) >= amount;
+        return this.getMoneyBalance(nickName.toLowerCase(Locale.ROOT)) >= amount;
     }
 
     @Override
     public boolean withdrawMoney(String nickName, double amount) {
-        double result = this.getMoneyBalance(nickName) - amount;
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        double result = this.getMoneyBalance(playerNameLC) - amount;
         if (result < 0) result = 0;
-        this.setMoney(nickName, result);
+        this.setMoney(playerNameLC, result);
         return true;
     }
 
     @Override
     public boolean depositMoney(String nickName, double amount) {
-        double result = this.getMoneyBalance(nickName) + amount;
-        this.setMoney(nickName, result);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        double result = this.getMoneyBalance(playerNameLC) + amount;
+        this.setMoney(playerNameLC, result);
         return true;
     }
 
     @Override
     public boolean setMoney(String nickName, double amount) {
-        PlayerData playerData = this.playersCache.get(nickName);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        PlayerData playerData = this.playersCache.get(playerNameLC);
         if (playerData != null) {
             playerData.setMoney(amount);
         }
         CompletableFuture.runAsync(() -> {
-            this.redisConfig.getRedisClient().hset(this.redisConfig.getBalanceKey(), nickName, String.valueOf(amount));
-            this.redisMessenger.publishMoneyMessage(new MessageData(nickName, amount));
+            this.redisCommands.hset(this.redisConfig.getBalanceKey(), playerNameLC, String.valueOf(amount));
+            this.redisMessenger.publishMoneyMessage(new MessageData(playerNameLC, amount));
         }, this.executorService).exceptionally(throwable -> {
             this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
@@ -104,12 +115,13 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public int getCoinsBalance(String nickName) {
-        PlayerData playerData = this.playersCache.get(nickName);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        PlayerData playerData = this.playersCache.get(playerNameLC);
         if (playerData != null) {
             return playerData.getCoins();
         }
         try {
-            String coins = this.redisConfig.getRedisClient().hget(this.redisConfig.getCoinsKey(), nickName);
+            String coins = this.redisCommands.hget(this.redisConfig.getCoinsKey(), playerNameLC);
             return coins == null ? manager.getConfigFile().getStartCoins() : Integer.parseInt(coins);
         } catch (Exception e) {
             manager.getPlugin().getLogger().warning(e.getMessage());
@@ -119,33 +131,36 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public boolean hasCoins(String nickName, int amount) {
-        return this.getCoinsBalance(nickName) >= amount;
+        return this.getCoinsBalance(nickName.toLowerCase(Locale.ROOT)) >= amount;
     }
 
     @Override
     public boolean withdrawCoins(String nickName, int amount) {
-        int result = this.getCoinsBalance(nickName) - amount;
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        int result = this.getCoinsBalance(playerNameLC) - amount;
         if (result < 0) result = 0;
-        this.setCoins(nickName, result);
+        this.setCoins(playerNameLC, result);
         return true;
     }
 
     @Override
     public boolean depositCoins(String nickName, int amount) {
-        int result = this.getCoinsBalance(nickName) + amount;
-        this.setCoins(nickName, result);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        int result = this.getCoinsBalance(playerNameLC) + amount;
+        this.setCoins(playerNameLC, result);
         return true;
     }
 
     @Override
     public boolean setCoins(String nickName, int amount) {
-        PlayerData playerData = this.playersCache.get(nickName);
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
+        PlayerData playerData = this.playersCache.get(playerNameLC);
         if (playerData != null) {
             playerData.setCoins(amount);
         }
         CompletableFuture.runAsync(() -> {
-            this.redisConfig.getRedisClient().hset(this.redisConfig.getCoinsKey(), nickName, String.valueOf(amount));
-            this.redisMessenger.publishCoinsMessage(new MessageData(nickName, amount));
+            this.redisCommands.hset(this.redisConfig.getCoinsKey(), playerNameLC, String.valueOf(amount));
+            this.redisMessenger.publishCoinsMessage(new MessageData(playerNameLC, amount));
         }, this.executorService).exceptionally(throwable -> {
             this.manager.getPlugin().getLogger().log(Level.SEVERE, throwable.getMessage());
             return null;
@@ -161,10 +176,10 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public void clearBalances(String nickName) {
+        String playerNameLC = nickName.toLowerCase(Locale.ROOT);
         CompletableFuture.runAsync(() -> {
-            RedisClient redisClient = this.redisConfig.getRedisClient();
-            redisClient.hdel(this.redisConfig.getBalanceKey(), nickName);
-            redisClient.hdel(this.redisConfig.getCoinsKey(), nickName);
+            this.redisCommands.hdel(this.redisConfig.getBalanceKey(), playerNameLC);
+            this.redisCommands.hdel(this.redisConfig.getCoinsKey(), playerNameLC);
         }).exceptionally(throwable -> {
             manager.getPlugin().getLogger().info(throwable.getMessage());
             return null;
@@ -173,28 +188,28 @@ public class RedisStorage extends AbstractStorage {
 
     @Override
     public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
-        TObjectDoubleMap<String> doubleMap = new TObjectDoubleHashMap<>();
-        this.redisConfig.getRedisClient().hgetAll(this.redisConfig.getBalanceKey()).forEach((s, s2) -> doubleMap.put(s, Double.parseDouble(s2)));
+        Object2DoubleMap<String> doubleMap = new Object2DoubleOpenHashMap<>();
+        this.redisCommands.hgetall(this.redisConfig.getBalanceKey()).forEach((s, s2) -> doubleMap.put(s, Double.parseDouble(s2)));
         List<String> keys = new ArrayList<>(doubleMap.keySet());
-        keys.sort(Comparator.comparingDouble(doubleMap::get));
+        keys.sort(Comparator.comparingDouble(doubleMap::getDouble));
         var dataList = new ArrayList<TopManager.TopLineDouble>();
         for (int i = 0; i < amount && keys.size() != i; i++) {
             String key = keys.get(i);
-            dataList.add(new TopManager.TopLineDouble(key, doubleMap.get(key), i+1));
+            dataList.add(new TopManager.TopLineDouble(key, doubleMap.getDouble(key), i+1));
         }
         return dataList;
     }
 
     @Override
     public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
-        TObjectIntMap<String> intMap = new TObjectIntHashMap<>();
-        this.redisConfig.getRedisClient().hgetAll(this.redisConfig.getCoinsKey()).forEach((s, s2) -> intMap.put(s, Integer.parseInt(s2)));
+        Object2IntMap<String> intMap = new Object2IntOpenHashMap<>();
+        this.redisCommands.hgetall(this.redisConfig.getCoinsKey()).forEach((s, s2) -> intMap.put(s, Integer.parseInt(s2)));
         List<String> keys = new ArrayList<>(intMap.keySet());
-        keys.sort(Comparator.comparingInt(intMap::get));
+        keys.sort(Comparator.comparingInt(intMap::getInt));
         var dataList = new ArrayList<TopManager.TopLineInteger>();
         for (int i = 0; i < amount && keys.size() != i; i++) {
             String key = keys.get(i);
-            dataList.add(new TopManager.TopLineInteger(key, intMap.get(key), i+1));
+            dataList.add(new TopManager.TopLineInteger(key, intMap.getInt(key), i+1));
         }
         return dataList;
     }
@@ -203,5 +218,6 @@ public class RedisStorage extends AbstractStorage {
     public void close() {
         if (this.redisConfig != null) this.redisConfig.close();
         if (this.redisMessenger != null) this.redisMessenger.close();
+        this.executorService.shutdown();
     }
 }

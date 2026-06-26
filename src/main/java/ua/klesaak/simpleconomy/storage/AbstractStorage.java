@@ -12,11 +12,12 @@ import java.util.concurrent.Executors;
 
 public abstract class AbstractStorage implements AutoCloseable {
     protected final SimpleEconomyManager manager;
+    protected final ExecutorService executorService;
     protected final Map<String, PlayerData> playersCache = new ConcurrentHashMap<>(Bukkit.getMaxPlayers());
-    protected final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
-    public AbstractStorage(SimpleEconomyManager manager) {
+    public AbstractStorage(SimpleEconomyManager manager, int threads) {
         this.manager = manager;
+        this.executorService = Executors.newFixedThreadPool(threads);
     }
 
     public abstract void cache(String nickName);
@@ -53,6 +54,10 @@ public abstract class AbstractStorage implements AutoCloseable {
      */
     public abstract List<TopManager.TopLineDouble> getMoneyTop(int amount);
     public abstract List<TopManager.TopLineInteger> getCoinsTop(int amount);
+
+    public ExecutorService getExecutorService() {
+        return this.executorService;
+    }
 
     @Override
     public abstract void close();

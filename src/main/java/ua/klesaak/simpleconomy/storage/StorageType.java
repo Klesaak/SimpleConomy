@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum StorageType {
     FILE("JSON", "file"),
-    REDIS("REDIS", "jedis");
+    REDIS("REDIS", "redis");
 
     private final String name;
 

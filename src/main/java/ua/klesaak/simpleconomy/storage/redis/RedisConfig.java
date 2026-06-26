@@ -1,16 +1,18 @@
 package ua.klesaak.simpleconomy.storage.redis;
 
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulRedisConnection;
 import lombok.Getter;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.bukkit.configuration.ConfigurationSection;
-import redis.clients.jedis.*;
+import org.bukkit.configuration.ConfigurationSection;;
 
 @Getter
 public class RedisConfig implements AutoCloseable {
     private final String address, password, balanceKey, coinsKey;
-    private final int port, database;
+    private final int port, database, threads;
+
     private final RedisClient redisClient;
-    private final RedisClient pusSubRedisClient;
+    private final StatefulRedisConnection<String, String> statefulRedisConnection;
 
     public RedisConfig(ConfigurationSection configurationSection) {
         this.address = configurationSection.getString("host");
@@ -19,35 +21,28 @@ public class RedisConfig implements AutoCloseable {
         this.password = configurationSection.getString("password");
         this.balanceKey = configurationSection.getString("balanceKey");
         this.coinsKey = configurationSection.getString("coinsKey");
+        this.threads = configurationSection.getInt("threads");
 
-        HostAndPort hostAndPort = new HostAndPort(this.address, this.port);
-        DefaultJedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
-                .timeoutMillis(30_000)
-                .database(this.database)
-                .password(this.password == null || this.password.isEmpty() ? null : this.password).build();
-        GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
-        poolConfig.setLifo(false);
-        poolConfig.setTestOnBorrow(true);
-        poolConfig.setMinIdle(3);
-        poolConfig.setMaxTotal(500);
-        this.redisClient = RedisClient.builder()
-                .poolConfig(poolConfig)
-                .clientConfig(clientConfig)
-                .hostAndPort(hostAndPort).build();
-        this.pusSubRedisClient = RedisClient.builder()
-                .poolConfig(poolConfig)
-                .clientConfig(DefaultJedisClientConfig.builder()
-                                .timeoutMillis(30_000)
-                                .password(this.password == null || this.password.isEmpty() ? null : this.password)
-                                .build()
-                )
-                .build();
+        this.redisClient = this.createRedisClient();
+        this.statefulRedisConnection = this.redisClient.connect();
     }
 
+    public RedisClient createRedisClient() {
+        return RedisClient.create(RedisURI.builder()
+                .withHost(this.address)
+                .withPort(this.port)
+                .withDatabase(this.database)
+                .withPassword(this.password)
+                .build());
+    }
 
     @Override
     public void close() {
-        if (this.redisClient != null) this.redisClient.close();
-        if (this.pusSubRedisClient != null) this.pusSubRedisClient.close();
+        if (this.redisClient != null) {
+            this.redisClient.close();
+        }
+        if (this.statefulRedisConnection != null) {
+            this.statefulRedisConnection.close();
+        }
     }
 }

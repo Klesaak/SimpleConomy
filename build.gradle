@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.gradleup.shadow") version "9.3.1"
+}
+
+group = 'net.klesaak'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
+    maven {
+        url = 'https://repo.helpch.at/releases'
+    }
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven { url = 'https://maven.enginehub.org/repo/' }
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
+
+    // https://www.spigotmc.org/wiki/spigot-plugin-yml-annotations/
+    compileOnly("org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT")
+    annotationProcessor("org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT")
+    //https://github.com/MilkBowl/VaultAPI
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    // https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Hook-into-PlaceholderAPI
+    compileOnly 'me.clip:placeholderapi:2.12.2'
+
+    ///LIBS///
+    compileOnly files('E:/EclipseWS/StorageLib.jar')
+}
+
+shadowJar {
+    archiveBaseName.set("SimpleConomy")
+    archiveVersion.set("")
+    archiveClassifier.set("")
+    destinationDirectory.set(file("E:\\Desktop\\"))
+}

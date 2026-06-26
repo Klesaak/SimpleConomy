@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
+import org.bukkit.entity.Player;
 
 @Getter
 public class Message {
@@ -22,13 +22,15 @@ public class Message {
     }
 
     public void send(CommandSender sender) {
-        SimpleEconomyManager.BUKKIT_AUDIENCES.sender(sender).sendMessage(MINI_MESSAGE.deserialize(this.miniMessage));
+        sender.sendMessage(MINI_MESSAGE.deserialize(this.miniMessage));
     }
 
     public void broadcast() {
         Component message = MINI_MESSAGE.deserialize(this.miniMessage);
-        Bukkit.getOnlinePlayers().forEach(player -> SimpleEconomyManager.BUKKIT_AUDIENCES.sender(player).sendMessage(message));
-        SimpleEconomyManager.BUKKIT_AUDIENCES.sender(Bukkit.getConsoleSender()).sendMessage(message);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(message);
+        }
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
     public static class TagMessage extends Message {

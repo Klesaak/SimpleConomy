@@ -48,7 +48,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "addmoney": {
                 this.cmdVerify(args.length != 3,"<gold>/" + label + " addmoney <ник> <сумма> - выдать деньги.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) + money > config.getMaxBalance()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
@@ -62,7 +62,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "addcoins": {
                 this.cmdVerify(args.length != 3, "<gold>/" + label + " addcoins <ник> <сумма> - выдать коины.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) + coins > config.getMaxCoins()) {
                     sender.sendMessage(ChatColor.RED + "Баланс коинов превысит максимально допустимый.");
@@ -76,7 +76,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "setmoney": {
                 this.cmdVerify(args.length != 3, "<gold>/" + label + " setmoney <ник> <сумма> - установить деньги.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var money = this.cmdVerifyInt(args[2]);
                 if (money > config.getMaxBalance()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
@@ -95,7 +95,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "setcoins": {
                 this.cmdVerify(args.length != 3,"<gold>/" + label + " setcoins <ник> <сумма> - установить коины.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var coins = this.cmdVerifyInt(args[2]);
                 if (coins > config.getMaxCoins()) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока превысит максимально допустимый.");
@@ -113,7 +113,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "wmoney": {
                 this.cmdVerify(args.length != 3,"<gold>/" + label + " wmoney <ник> <сумма> - забрать деньги.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var money = this.cmdVerifyInt(args[2]);
                 if (storage.getMoneyBalance(nickName) - money < 0) {
                     sender.sendMessage(ChatColor.RED + "Баланс игрока не может быть меньше нуля.");
@@ -127,7 +127,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "wcoins": {
                 this.cmdVerify(args.length != 3,"<gold>/" + label + " wcoins <ник> <сумма> - забрать коины.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 var coins = this.cmdVerifyInt(args[2]);
                 if (storage.getCoinsBalance(nickName) - coins < 0) {
                     sender.sendMessage(ChatColor.RED + "Баланс коинов игрока не может быть меньше нуля.");
@@ -141,7 +141,7 @@ public class AdminCommands extends AbstractBukkitCommand {
             }
             case "clear": {
                 this.cmdVerify(args.length != 2, "<gold>/" + label + " clear <ник> - очистить балансы игроку.");
-                var nickName = args[1].toLowerCase();
+                var nickName = args[1];
                 storage.clearBalances(nickName);
                 sender.sendMessage(ChatColor.GOLD + "Балансы игрока " + ChatColor.RED + nickName + ChatColor.GOLD +  " успешно сброшены.");
                 break;

@@ -1,8 +1,6 @@
 package ua.klesaak.simpleconomy.manager;
 
 import lombok.Getter;
-import lombok.val;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,14 +14,13 @@ import ua.klesaak.simpleconomy.configurations.ConfigFile;
 import ua.klesaak.simpleconomy.configurations.MessagesFile;
 import ua.klesaak.simpleconomy.papi.PAPIExpansion;
 import ua.klesaak.simpleconomy.storage.AbstractStorage;
+import ua.klesaak.simpleconomy.storage.StorageType;
 import ua.klesaak.simpleconomy.storage.file.JsonStorage;
 import ua.klesaak.simpleconomy.storage.redis.RedisStorage;
 import ua.klesaak.simpleconomy.vault.VaultEconomyHook;
 
 @Getter
 public class SimpleEconomyManager {
-    public static BukkitAudiences BUKKIT_AUDIENCES;
-
     private final SimpleConomyPlugin plugin;
     private ConfigFile configFile;
     private MessagesFile messagesFile;
@@ -55,11 +52,10 @@ public class SimpleEconomyManager {
             this.topManager = new TopManager(this, this.configFile);
         }
         new SConomyListener(this);
-        BUKKIT_AUDIENCES = BukkitAudiences.create(this.plugin);
     }
 
     private void initStorage() {
-        val storageType = this.configFile.getStorageType();
+        StorageType storageType = this.configFile.getStorageType();
         switch (storageType) {
             case FILE: {
                 this.storage = new JsonStorage(this);
@@ -90,9 +86,5 @@ public class SimpleEconomyManager {
             this.papiExpansion.unregister();
         }
         this.topManager.close();
-        if(BUKKIT_AUDIENCES != null) {
-            BUKKIT_AUDIENCES.close();
-            BUKKIT_AUDIENCES = null;
-        }
     }
 }

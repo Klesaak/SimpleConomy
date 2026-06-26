@@ -6,10 +6,10 @@ import ua.klesaak.simpleconomy.utils.JsonData;
 
 import java.util.UUID;
 
-@Getter
+@Getter @Setter
 public class MessageData {
-    private final String playerName;
-    private final double amount;
+    private String playerName;
+    private double amount;
 
     @Setter
     private UUID uuid;

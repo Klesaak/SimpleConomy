@@ -1,10 +1,10 @@
 package ua.klesaak.simpleconomy.configurations;
 
 import lombok.Getter;
+import net.klesaak.storagelib.api.NumberUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import ua.klesaak.simpleconomy.storage.StorageType;
-import ua.klesaak.simpleconomy.utils.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,7 +57,7 @@ public class ConfigFile extends PluginConfig {
     }
 
     public ConfigurationSection getRedisSection() {
-        return this.getConfigurationSection("jedis");
+        return this.getConfigurationSection("redis-settings");
     }
 
     public String format(double amount) {

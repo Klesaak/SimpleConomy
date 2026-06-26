@@ -1,70 +1,74 @@
 package ua.klesaak.simpleconomy.api;
 
-import lombok.experimental.UtilityClass;
 import lombok.val;
 import ua.klesaak.simpleconomy.manager.SimpleEconomyManager;
 import ua.klesaak.simpleconomy.manager.TopManager;
 
 import java.util.List;
 
-@UtilityClass
 public class SimpleEconomyAPI {
-    private SimpleEconomyManager MANAGER;
+    private static SimpleEconomyAPI INSTANCE;
 
-    public void register(SimpleEconomyManager manager) {
-        MANAGER = manager;
+    private final SimpleEconomyManager manager;
+
+    private SimpleEconomyAPI(SimpleEconomyManager manager) {
+        this.manager = manager;
+    }
+
+    public static void register(SimpleEconomyManager manager) {
+        INSTANCE = new SimpleEconomyAPI(manager);
+    }
+
+    public static SimpleEconomyAPI get() {
+        return INSTANCE;
     }
 
     public double getMoneyBalance(String nickName) {
-        return MANAGER.getStorage().getMoneyBalance(nickName.toLowerCase());
+        return manager.getStorage().getMoneyBalance(nickName);
     }
 
     public int getCoinsBalance(String nickName) {
-        return MANAGER.getStorage().getCoinsBalance(nickName.toLowerCase());
+        return manager.getStorage().getCoinsBalance(nickName);
     }
 
     public boolean hasMoney(String nickName, double amount) {
-        return MANAGER.getStorage().hasMoney(nickName.toLowerCase(), amount);
+        return manager.getStorage().hasMoney(nickName, amount);
     }
 
     public boolean hasCoins(String nickName, int amount) {
-        return MANAGER.getStorage().hasCoins(nickName.toLowerCase(), amount);
+        return manager.getStorage().hasCoins(nickName, amount);
     }
 
     public void withdrawMoney(String nickName, double amount) {
-        String nickNameLC = nickName.toLowerCase();
-        double result = getMoneyBalance(nickNameLC) - amount;
+        double result = getMoneyBalance(nickName) - amount;
         if (result < 0) result = 0;
-        MANAGER.getStorage().withdrawMoney(nickNameLC, result);
+        manager.getStorage().withdrawMoney(nickName, result);
     }
 
     public void depositMoney(String nickName, double amount) {
-        String nickNameLC = nickName.toLowerCase();
-        double result = getMoneyBalance(nickNameLC) + amount;
-        val maxBalance = MANAGER.getConfigFile().getMaxBalance();
+        double result = getMoneyBalance(nickName) + amount;
+        val maxBalance = manager.getConfigFile().getMaxBalance();
         if (result > maxBalance) result = maxBalance;
-        MANAGER.getStorage().depositMoney(nickNameLC, result);
+        manager.getStorage().depositMoney(nickName, result);
     }
 
     public void withdrawCoins(String nickName, int amount) {
-        String nickNameLC = nickName.toLowerCase();
-        int result = getCoinsBalance(nickNameLC) - amount;
+        int result = getCoinsBalance(nickName) - amount;
         if (result < 0) result = 0;
-        MANAGER.getStorage().withdrawCoins(nickNameLC, result);
+        manager.getStorage().withdrawCoins(nickName, result);
     }
 
     public void depositCoins(String nickName, int amount) {
-        String nickNameLC = nickName.toLowerCase();
-        int result = getCoinsBalance(nickNameLC) + amount;
-        val maxBalance = MANAGER.getConfigFile().getMaxCoins();
+        int result = getCoinsBalance(nickName) + amount;
+        val maxBalance = manager.getConfigFile().getMaxCoins();
         if (result > maxBalance) result = maxBalance;
-        MANAGER.getStorage().depositCoins(nickNameLC, result);
+        manager.getStorage().depositCoins(nickName, result);
     }
 
     public List<TopManager.TopLineDouble> getMoneyTop(int amount) {
-        return MANAGER.getStorage().getMoneyTop(amount);
+        return manager.getStorage().getMoneyTop(amount);
     }
     public List<TopManager.TopLineInteger> getCoinsTop(int amount) {
-        return MANAGER.getStorage().getCoinsTop(amount);
+        return manager.getStorage().getCoinsTop(amount);
     }
 }

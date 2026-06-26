@@ -21,7 +21,7 @@ public class PayCommand extends AbstractBukkitCommand {
     @Override
     public void onReceiveCommand(CommandSender sender, String label, String[] args) {
         Player playerSender = this.cmdVerifyPlayer(sender);
-        String senderNameLC = playerSender.getName().toLowerCase();
+        String senderName = playerSender.getName();
         var messagesFile = this.manager.getMessagesFile();
         if (args.length != 2) {
             messagesFile.getVaultPayUsage().tag(LABEL_PATTERN, label).send(sender);
@@ -29,9 +29,8 @@ public class PayCommand extends AbstractBukkitCommand {
         }
         var config = this.manager.getConfigFile();
         var storage = this.manager.getStorage();
-        var senderBalance = storage.getMoneyBalance(senderNameLC);
+        var senderBalance = storage.getMoneyBalance(senderName);
         var playerName = args[0];
-        var playerNameLC = playerName.toLowerCase();
         int sum = this.cmdVerifyInt(args[1], messagesFile.getNotInteger().tag(NUMBER_PATTERN, args[1]));
         if (playerSender.getName().equalsIgnoreCase(playerName)) {
             messagesFile.getPaySelf().send(sender);
@@ -42,7 +41,7 @@ public class PayCommand extends AbstractBukkitCommand {
             messagesFile.getPlayerNotFound().send(sender);
             return;
         }
-        var receiverBalance = storage.getMoneyBalance(playerNameLC);
+        var receiverBalance = storage.getMoneyBalance(playerName);
         if (senderBalance < sum) {
             messagesFile.getVaultNoMoney().tag(BALANCE_PATTERN, config.formatMoney(senderBalance)).send(sender);
             return;
@@ -59,8 +58,8 @@ public class PayCommand extends AbstractBukkitCommand {
                     .tag(MAX_BALANCE_PATTERN, config.formatMoney(config.getMaxBalance())).send(sender);
             return;
         }
-        storage.depositMoney(playerNameLC, sum);
-        storage.withdrawMoney(senderNameLC, sum);
+        storage.depositMoney(playerName, sum);
+        storage.withdrawMoney(senderName, sum);
         var receiverNewBalance = config.formatMoney(sum + receiverBalance);
         var newSenderBalance = senderBalance - sum;
         messagesFile.getVaultPaySuccessful()

@@ -3,25 +3,24 @@
 # sc_money - кол-во денег игрока.
 # sc_coins_formatted - кол-во коинов игрока в отформатированном виде (см. ниже plural, singular, plural2).
 # sc_money_formatted - кол-во денег игрока в отформатированном виде (см. ниже plural, singular, plural2).
-# sc_coins_top_player_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
-# sc_money_top_player_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
+# sc_coins_player_top_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
+# sc_money_player_top_%место% - ник игрока по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
 # sc_coins_top_%место% - баланс игрока по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
 # sc_money_top_%место% - баланс игрока по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
-# sc_coins_top_formatted_%место% - баланс игрока в отформатированном виде по указанному индексу, если индекс больше чем playerTop->coinsCount - выведется пустое значение.
-# sc_money_top_formatted_%место% - баланс игрока в отформатированном виде по указанному индексу, если индекс больше чем playerTop->balanceCount - выведется пустое значение.
 
-#Доступные хранилища: jedis, file
+#Доступные хранилища: redis, file
 storage: file
 
 #Будет ли функционировать команда /pay (актуально для серверов мини-игр)
 payCommandEnabled: true
 
 #Настройка redis хранилища
-jedis:
+redis-settings:
   host: 127.0.0.1
   port: 6379
   password: ""
   database: 0
+  threads: 4
   balanceKey: "sc-balance-key"
   coinsKey: "sc-coins-key"
 

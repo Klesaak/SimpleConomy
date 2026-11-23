@@ -1,0 +1,1 @@
+INSERT INTO `%table%` (`player_name`, `coins_balance`) VALUES (?, LEAST(?, %maxBalance%)) ON DUPLICATE KEY UPDATE coins_balance = LEAST(coins_balance + VALUES(coins_balance), %maxBalance%);

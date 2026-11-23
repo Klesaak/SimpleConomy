@@ -1,0 +1,1 @@
+INSERT INTO `%table%` (`player_name`, `coins_balance`) VALUES (?, GREATEST(?, 0)) ON DUPLICATE KEY UPDATE coins_balance = GREATEST(coins_balance - VALUES(coins_balance), 0);

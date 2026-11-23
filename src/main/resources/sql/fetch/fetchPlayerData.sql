@@ -1,0 +1,1 @@
+SELECT `money_balance`, `coins_balance` FROM `%table%` WHERE `player_name` = ?;
